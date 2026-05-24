@@ -65,6 +65,8 @@ export interface GameSettings {
   multiPV: number
   enableTimer: boolean
   timeControl: number
+  autoAnalysis: boolean
+  showMaterialBar: boolean
 }
 
 export interface CapturedPieces {

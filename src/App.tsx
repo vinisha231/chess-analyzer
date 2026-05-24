@@ -33,6 +33,8 @@ const DEFAULT_SETTINGS: GameSettings = {
   multiPV: 3,
   enableTimer: false,
   timeControl: 300,
+  autoAnalysis: true,
+  showMaterialBar: true,
 }
 
 export default function App() {
@@ -68,10 +70,10 @@ export default function App() {
     if (gameState.isGameOver) {
       setShowResultModal(true)
       stop()
-    } else {
+    } else if (settings.autoAnalysis) {
       analyze(gameState.fen)
     }
-  }, [gameState.fen, gameState.isGameOver])
+  }, [gameState.fen, gameState.isGameOver, settings.autoAnalysis])
 
   useEffect(() => {
     if (!gameState.isGameOver && settings.enableTimer && gameState.moveHistory.length > 0) {
@@ -310,7 +312,7 @@ export default function App() {
               timeLow={flipped ? timer.blackLow : timer.whiteLow}
             />
 
-            <MaterialBar white={material.white} black={material.black} />
+            {settings.showMaterialBar && <MaterialBar white={material.white} black={material.black} />}
             <PositionInfo fen={gameState.fen} moveCount={gameState.moveHistory.length} />
 
             <GameControls

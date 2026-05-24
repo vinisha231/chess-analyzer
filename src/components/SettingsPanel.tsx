@@ -59,6 +59,8 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <Toggle label="Show last move" value={settings.showLastMove} onChange={v => update('showLastMove', v)} />
           <Toggle label="Show best move arrow" value={settings.showBestMoveArrow} onChange={v => update('showBestMoveArrow', v)} />
           <Toggle label="Sound effects" value={settings.soundEnabled} onChange={v => update('soundEnabled', v)} />
+          <Toggle label="Auto-analysis" value={settings.autoAnalysis} onChange={v => update('autoAnalysis', v)} />
+          <Toggle label="Show material bar" value={settings.showMaterialBar} onChange={v => update('showMaterialBar', v)} />
           <Toggle label="Game timer" value={settings.enableTimer} onChange={v => update('enableTimer', v)} />
 
           <div className="py-2">
