@@ -17,7 +17,7 @@ export function useStockfish(depth = 18, multiPV = 3) {
   const currentFenRef = useRef<string>('')
 
   useEffect(() => {
-    const worker = new Worker('/stockfish.js')
+    const worker = new Worker(`${import.meta.env.BASE_URL}stockfish.js`)
     workerRef.current = worker
 
     worker.postMessage('uci')
