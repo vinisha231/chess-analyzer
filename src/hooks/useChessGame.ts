@@ -189,7 +189,11 @@ export function useChessGame() {
   }, [])
 
   const getLegalMoves = useCallback((square: string): string[] => {
-    return chessRef.current.moves({ square: square as any, verbose: true }).map((m: any) => m.to)
+    try {
+      return chessRef.current.moves({ square: square as any, verbose: true }).map((m: any) => m.to)
+    } catch {
+      return []
+    }
   }, [])
 
   const updateMoveEval = useCallback((index: number, evalBefore: number, evalAfter: number, bestMove?: string) => {
