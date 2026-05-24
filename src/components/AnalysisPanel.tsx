@@ -79,10 +79,17 @@ export default function AnalysisPanel({ result, currentFen }: Props) {
       </div>
 
       {result.bestMove && (
-        <div className="mt-1 px-2 py-1.5 bg-blue-900/30 rounded border border-blue-800/50">
+        <div className="mt-1 px-2 py-1.5 bg-blue-900/30 rounded border border-blue-800/50 flex items-center justify-between">
           <span className="text-xs text-blue-300">
-            Best move: <span className="font-mono font-bold text-blue-200">{result.bestMove}</span>
+            Best: <span className="font-mono font-bold text-blue-200">
+              {uciLineToPretty([result.bestMove], currentFen) || result.bestMove}
+            </span>
           </span>
+          {result.mate !== null && (
+            <span className="text-xs text-yellow-400 font-bold">
+              Mate in {Math.abs(result.mate)}
+            </span>
+          )}
         </div>
       )}
     </div>
