@@ -12,6 +12,7 @@ import GameResultModal from './components/GameResultModal'
 import SettingsPanel from './components/SettingsPanel'
 import PGNPanel from './components/PGNPanel'
 import GameStats from './components/GameStats'
+import PromotionDialog from './components/PromotionDialog'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 
@@ -43,6 +44,7 @@ export default function App() {
   const [playerNames] = useState({ white: 'White', black: 'Black' })
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
   const [showResultModal, setShowResultModal] = useState(false)
+  const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null)
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -101,9 +103,21 @@ export default function App() {
     }]
   }, [sfResult.bestMove, settings.showBestMoveArrow])
 
+  function isPromotionMove(from: string, to: string): boolean {
+    const piece = game.chess.current.get(from as any)
+    if (!piece || piece.type !== 'p') return false
+    const toRank = to[1]
+    return (piece.color === 'w' && toRank === '8') || (piece.color === 'b' && toRank === '1')
+  }
+
   function onSquareClick(square: string) {
     if (gameState.isGameOver) return
     if (selectedSquare && selectedSquare !== square) {
+      if (isPromotionMove(selectedSquare, square)) {
+        setPendingPromotion({ from: selectedSquare, to: square })
+        setSelectedSquare(null)
+        return
+      }
       const ok = makeMove(selectedSquare, square)
       setSelectedSquare(null)
       if (ok) return
@@ -118,9 +132,19 @@ export default function App() {
 
   function onPieceDrop(from: string, to: string | null): boolean {
     if (gameState.isGameOver || !to) return false
+    if (isPromotionMove(from, to)) {
+      setPendingPromotion({ from, to })
+      return true
+    }
     const ok = makeMove(from, to, 'q')
     setSelectedSquare(null)
     return ok
+  }
+
+  function handlePromotion(piece: 'q' | 'r' | 'b' | 'n') {
+    if (!pendingPromotion) return
+    makeMove(pendingPromotion.from, pendingPromotion.to, piece)
+    setPendingPromotion(null)
   }
 
   function handleReset() {
@@ -281,6 +305,13 @@ export default function App() {
         </div>
       </main>
 
+      {pendingPromotion && (
+        <PromotionDialog
+          color={gameState.turn}
+          onSelect={handlePromotion}
+          onCancel={() => setPendingPromotion(null)}
+        />
+      )}
       {showResultModal && (
         <GameResultModal
           gameState={gameState}
