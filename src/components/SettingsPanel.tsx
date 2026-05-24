@@ -64,9 +64,9 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <Toggle label="Game timer" value={settings.enableTimer} onChange={v => update('enableTimer', v)} />
 
           <div className="py-2">
-            <label className="text-sm text-gray-300 block mb-1">Analysis depth: {settings.analysisDepth}</label>
+            <label className="text-sm text-gray-300 block mb-1">Analysis depth: {settings.analysisDepth} <span className="text-gray-500">(capped at 2s)</span></label>
             <input
-              type="range" min={8} max={24} step={2}
+              type="range" min={8} max={20} step={1}
               value={settings.analysisDepth}
               onChange={e => update('analysisDepth', parseInt(e.target.value))}
               className="w-full accent-blue-500"

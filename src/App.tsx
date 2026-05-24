@@ -31,7 +31,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   showLastMove: true,
   showBestMoveArrow: true,
   soundEnabled: true,
-  analysisDepth: 18,
+  analysisDepth: 15,
   multiPV: 3,
   enableTimer: false,
   timeControl: 300,

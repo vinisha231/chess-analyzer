@@ -10,11 +10,13 @@ const DEFAULT_RESULT: StockfishResult = {
   isCalculating: false,
 }
 
-export function useStockfish(depth = 18, multiPV = 3) {
+// Minimum depth before we start showing results to the user
+const MIN_DISPLAY_DEPTH = 8
+
+export function useStockfish(depth = 15, multiPV = 3) {
   const [result, setResult] = useState<StockfishResult>(DEFAULT_RESULT)
   const workerRef = useRef<Worker | null>(null)
   const pendingLines = useRef<Map<number, AnalysisLine>>(new Map())
-  const currentFenRef = useRef<string>('')
 
   useEffect(() => {
     const worker = new Worker(`${import.meta.env.BASE_URL}stockfish.js`)
@@ -28,10 +30,10 @@ export function useStockfish(depth = 18, multiPV = 3) {
       const line = e.data
       if (!line) return
 
-      if (line.startsWith('info') && line.includes('score')) {
-        const depthMatch = line.match(/depth (\d+)/)
+      if (line.startsWith('info') && line.includes('score') && line.includes(' pv ')) {
+        const depthMatch = line.match(/\bdepth (\d+)/)
         const pvMatch = line.match(/ pv (.+)/)
-        const multipvMatch = line.match(/multipv (\d+)/)
+        const multipvMatch = line.match(/\bmultipv (\d+)/)
         const scoreMatch = line.match(/score cp (-?\d+)/)
         const mateMatch = line.match(/score mate (-?\d+)/)
 
@@ -46,19 +48,33 @@ export function useStockfish(depth = 18, multiPV = 3) {
           if (!existing || lineDepth >= existing.depth) {
             pendingLines.current.set(pvIndex, { moves, score, mate, depth: lineDepth })
           }
+
+          // Stream results immediately once we have a meaningful depth
+          if (lineDepth >= MIN_DISPLAY_DEPTH) {
+            const lines = Array.from(pendingLines.current.values())
+              .sort((a, b) => b.score - a.score)
+            const primary = lines[0]
+            setResult({
+              bestMove: primary?.moves[0] ?? null,
+              evaluation: primary?.score ?? 0,
+              mate: primary?.mate ?? null,
+              lines,
+              depth: lineDepth,
+              isCalculating: true,
+            })
+          }
         }
       }
 
       if (line.startsWith('bestmove')) {
         const parts = line.split(' ')
         const bestMove = parts[1] !== '(none)' ? parts[1] : null
-        const lines = Array.from(pendingLines.current.values()).sort((a, b) =>
-          b.score - a.score
-        )
+        const lines = Array.from(pendingLines.current.values())
+          .sort((a, b) => b.score - a.score)
         const primary = lines[0]
 
         setResult({
-          bestMove,
+          bestMove: bestMove ?? primary?.moves[0] ?? null,
           evaluation: primary?.score ?? 0,
           mate: primary?.mate ?? null,
           lines,
@@ -82,16 +98,17 @@ export function useStockfish(depth = 18, multiPV = 3) {
 
   const analyze = useCallback((fen: string) => {
     if (!workerRef.current) return
-    currentFenRef.current = fen
     pendingLines.current.clear()
     setResult(prev => ({ ...prev, isCalculating: true, bestMove: null, lines: [] }))
     workerRef.current.postMessage('stop')
     workerRef.current.postMessage(`position fen ${fen}`)
-    workerRef.current.postMessage(`go depth ${depth}`)
+    // Cap at 2 seconds OR the configured depth, whichever finishes first
+    workerRef.current.postMessage(`go depth ${depth} movetime 2000`)
   }, [depth])
 
   const stop = useCallback(() => {
     workerRef.current?.postMessage('stop')
+    setResult(prev => ({ ...prev, isCalculating: false }))
   }, [])
 
   return { result, analyze, stop }
