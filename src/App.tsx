@@ -348,7 +348,7 @@ export default function App() {
           </div>
 
           <div className="flex-1 bg-gray-800/50 rounded-xl p-3 overflow-hidden flex flex-col min-h-0">
-            {activeTab === 'analysis' && <AnalysisPanel result={sfResult} />}
+            {activeTab === 'analysis' && <AnalysisPanel result={sfResult} currentFen={gameState.fen} />}
             {activeTab === 'history' && (
               <MoveHistory
                 moves={gameState.moveHistory}

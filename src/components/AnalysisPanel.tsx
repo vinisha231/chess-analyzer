@@ -1,15 +1,31 @@
+import { Chess } from 'chess.js'
 import type { StockfishResult } from '../types'
 import { evalToDisplay } from '../utils/evaluation'
 
 interface Props {
   result: StockfishResult
+  currentFen: string
 }
 
-function uciToSan(moves: string[]): string {
-  return moves.slice(0, 5).join(' ')
+function uciLineToPretty(moves: string[], startFen: string): string {
+  try {
+    const chess = new Chess(startFen)
+    const sanMoves: string[] = []
+    for (const uci of moves.slice(0, 6)) {
+      const from = uci.slice(0, 2)
+      const to = uci.slice(2, 4)
+      const promotion = uci.length === 5 ? uci[4] as 'q' | 'r' | 'b' | 'n' : undefined
+      const move = chess.move({ from, to, promotion })
+      if (!move) break
+      sanMoves.push(move.san)
+    }
+    return sanMoves.join(' ')
+  } catch {
+    return moves.slice(0, 5).join(' ')
+  }
 }
 
-export default function AnalysisPanel({ result }: Props) {
+export default function AnalysisPanel({ result, currentFen }: Props) {
   const { lines, isCalculating, depth } = result
 
   return (
@@ -56,7 +72,7 @@ export default function AnalysisPanel({ result }: Props) {
               {evalToDisplay(line.score, line.mate)}
             </span>
             <span className="text-gray-300 font-mono leading-relaxed break-all">
-              {uciToSan(line.moves)}
+              {uciLineToPretty(line.moves, currentFen)}
             </span>
           </div>
         ))}
