@@ -85,9 +85,16 @@ export default function App() {
     const legalMoves = game.getLegalMoves(selectedSquare)
     const styles: Record<string, object> = {}
     legalMoves.forEach(sq => {
-      styles[sq] = {
-        background: 'radial-gradient(circle, rgba(99,102,241,0.65) 28%, transparent 30%)',
-        borderRadius: '50%',
+      const target = game.chess.current.get(sq as any)
+      if (target) {
+        styles[sq] = {
+          background: 'radial-gradient(circle, rgba(239,68,68,0.5) 60%, transparent 62%)',
+          boxShadow: 'inset 0 0 0 3px rgba(239,68,68,0.6)',
+        }
+      } else {
+        styles[sq] = {
+          background: 'radial-gradient(circle, rgba(99,102,241,0.65) 28%, transparent 30%)',
+        }
       }
     })
     return styles
