@@ -17,6 +17,7 @@ import PlayerNameEditor from './components/PlayerNameEditor'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
+import { detectGamePhase, phaseLabel } from './utils/gamePhase'
 
 const DEFAULT_SETTINGS: GameSettings = {
   theme: 'dark',
@@ -182,6 +183,12 @@ export default function App() {
     : gameState.isCheck ? `${gameState.turn === 'w' ? 'White' : 'Black'} in check!`
     : openingName ?? `${gameState.turn === 'w' ? 'White' : 'Black'} to move`
 
+  const gamePhase = detectGamePhase(gameState.fen, gameState.moveHistory.length)
+
+  function copyFEN() {
+    navigator.clipboard.writeText(gameState.fen)
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
       <header className="border-b border-gray-800 px-4 py-3 flex items-center justify-between shrink-0">
@@ -311,9 +318,21 @@ export default function App() {
             )}
           </div>
 
-          <div className="shrink-0 bg-gray-800/30 rounded-xl px-3 py-2 text-xs text-gray-500">
-            <span className="font-medium text-gray-400">Shortcuts: </span>
-            ← → navigate · ↑ first · ↓ last · F flip board
+          <div className="shrink-0 bg-gray-800/30 rounded-xl px-3 py-2 text-xs text-gray-500 flex items-center justify-between">
+            <div>
+              <span className="font-medium text-gray-400">Shortcuts: </span>
+              ← → navigate · ↑↓ first/last · F flip
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-600">{phaseLabel(gamePhase)}</span>
+              <button
+                onClick={copyFEN}
+                className="text-gray-500 hover:text-gray-300 transition-colors font-mono text-xs"
+                title="Copy FEN to clipboard"
+              >
+                Copy FEN
+              </button>
+            </div>
           </div>
         </div>
       </main>
