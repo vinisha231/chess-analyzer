@@ -51,6 +51,7 @@ export default function App() {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
   const [showResultModal, setShowResultModal] = useState(false)
   const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null)
+  const [gameMode, setGameMode] = useState<'pvp' | 'analysis'>('pvp')
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -221,7 +222,21 @@ export default function App() {
             <p className="text-xs text-gray-400">Stockfish 18 · Best-move analysis</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setGameMode('pvp')}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${gameMode === 'pvp' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            >
+              Player vs Player
+            </button>
+            <button
+              onClick={() => setGameMode('analysis')}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${gameMode === 'analysis' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            >
+              Analysis Mode
+            </button>
+          </div>
           <button
             onClick={() => setShowNameEditor(true)}
             className="text-xs px-2 py-1 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"

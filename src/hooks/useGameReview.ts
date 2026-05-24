@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-import { Chess } from 'chess.js'
 import type { MoveRecord, MoveClassification } from '../types'
 import { classifyMove } from '../utils/evaluation'
 
