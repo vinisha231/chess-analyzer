@@ -16,6 +16,7 @@ import PromotionDialog from './components/PromotionDialog'
 import PlayerNameEditor from './components/PlayerNameEditor'
 import PositionInfo from './components/PositionInfo'
 import MaterialBar from './components/MaterialBar'
+import MoveNavigator from './components/MoveNavigator'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
@@ -313,6 +314,11 @@ export default function App() {
             />
 
             {settings.showMaterialBar && <MaterialBar white={material.white} black={material.black} />}
+            <MoveNavigator
+              current={gameState.currentMoveIndex}
+              total={gameState.moveHistory.length}
+              onJump={goToMove}
+            />
             <PositionInfo fen={gameState.fen} moveCount={gameState.moveHistory.length} />
 
             <GameControls
