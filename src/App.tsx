@@ -14,6 +14,7 @@ import PGNPanel from './components/PGNPanel'
 import GameStats from './components/GameStats'
 import PromotionDialog from './components/PromotionDialog'
 import PlayerNameEditor from './components/PlayerNameEditor'
+import PositionInfo from './components/PositionInfo'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
@@ -292,6 +293,8 @@ export default function App() {
               timeDisplay={settings.enableTimer ? timer.formatTime(flipped ? timer.blackTime : timer.whiteTime) : undefined}
               timeLow={flipped ? timer.blackLow : timer.whiteLow}
             />
+
+            <PositionInfo fen={gameState.fen} moveCount={gameState.moveHistory.length} />
 
             <GameControls
               canUndo={gameState.moveHistory.length > 0}
