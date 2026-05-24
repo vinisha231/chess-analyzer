@@ -21,6 +21,7 @@ import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
 import { detectGamePhase, phaseLabel } from './utils/gamePhase'
+import { SoundEngine } from './utils/soundEngine'
 
 const DEFAULT_SETTINGS: GameSettings = {
   theme: 'dark',
@@ -71,10 +72,20 @@ export default function App() {
     if (gameState.isGameOver) {
       setShowResultModal(true)
       stop()
+      if (settings.soundEnabled) SoundEngine.gameEnd()
     } else if (settings.autoAnalysis) {
       analyze(gameState.fen)
     }
   }, [gameState.fen, gameState.isGameOver, settings.autoAnalysis])
+
+  useEffect(() => {
+    if (gameState.moveHistory.length === 0) return
+    if (!settings.soundEnabled) return
+    const lastMove = gameState.moveHistory[gameState.moveHistory.length - 1]
+    if (gameState.isCheck) SoundEngine.check()
+    else if (lastMove?.san.includes('x')) SoundEngine.capture()
+    else SoundEngine.move()
+  }, [gameState.moveHistory.length])
 
   useEffect(() => {
     if (!gameState.isGameOver && settings.enableTimer && gameState.moveHistory.length > 0) {
