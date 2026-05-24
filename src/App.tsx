@@ -93,10 +93,24 @@ export default function App() {
     return styles
   }, [selectedSquare, settings.showLegalMoves])
 
+  const lastMoveSquares = useCallback((): Record<string, object> => {
+    if (!settings.showLastMove) return {}
+    const lastMove = gameState.moveHistory[gameState.currentMoveIndex]
+    if (!lastMove) return {}
+    const chess = game.chess.current
+    const history = chess.history({ verbose: true })
+    const last = history[history.length - 1]
+    if (!last) return {}
+    return {
+      [last.from]: { backgroundColor: 'rgba(255, 214, 10, 0.35)' },
+      [last.to]: { backgroundColor: 'rgba(255, 214, 10, 0.5)' },
+    }
+  }, [gameState.currentMoveIndex, gameState.moveHistory, settings.showLastMove])
+
   const customSquareStyles = (): Record<string, object> => {
     const styles: Record<string, object> = {}
     if (selectedSquare) styles[selectedSquare] = { backgroundColor: 'rgba(99,102,241,0.45)' }
-    return { ...styles, ...legalSquareStyles() }
+    return { ...lastMoveSquares(), ...styles, ...legalSquareStyles() }
   }
 
   const bestMoveArrows = useCallback(() => {
