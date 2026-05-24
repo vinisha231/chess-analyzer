@@ -13,6 +13,7 @@ import SettingsPanel from './components/SettingsPanel'
 import PGNPanel from './components/PGNPanel'
 import GameStats from './components/GameStats'
 import PromotionDialog from './components/PromotionDialog'
+import PlayerNameEditor from './components/PlayerNameEditor'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 
@@ -41,7 +42,8 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showPGN, setShowPGN] = useState(false)
   const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats'>('analysis')
-  const [playerNames] = useState({ white: 'White', black: 'Black' })
+  const [playerNames, setPlayerNames] = useState({ white: 'White', black: 'Black' })
+  const [showNameEditor, setShowNameEditor] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
   const [showResultModal, setShowResultModal] = useState(false)
   const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null)
@@ -188,15 +190,24 @@ export default function App() {
             <p className="text-xs text-gray-400">Stockfish 18 · Best-move analysis</p>
           </div>
         </div>
-        <span className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
-          gameState.isCheck && !gameState.isCheckmate
-            ? 'bg-red-900/60 text-red-300 animate-pulse'
-            : gameState.isGameOver
-            ? 'bg-gray-700 text-gray-300'
-            : 'bg-gray-800 text-gray-400'
-        }`}>
-          {statusText}
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowNameEditor(true)}
+            className="text-xs px-2 py-1 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"
+            title="Edit player names"
+          >
+            ✏ Names
+          </button>
+          <span className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
+            gameState.isCheck && !gameState.isCheckmate
+              ? 'bg-red-900/60 text-red-300 animate-pulse'
+              : gameState.isGameOver
+              ? 'bg-gray-700 text-gray-300'
+              : 'bg-gray-800 text-gray-400'
+          }`}>
+            {statusText}
+          </span>
+        </div>
       </header>
 
       <main className="flex-1 flex gap-4 p-4 max-w-[1200px] mx-auto w-full overflow-hidden">
@@ -305,6 +316,13 @@ export default function App() {
         </div>
       </main>
 
+      {showNameEditor && (
+        <PlayerNameEditor
+          names={playerNames}
+          onChange={setPlayerNames}
+          onClose={() => setShowNameEditor(false)}
+        />
+      )}
       {pendingPromotion && (
         <PromotionDialog
           color={gameState.turn}
