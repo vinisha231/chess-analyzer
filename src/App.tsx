@@ -16,9 +16,11 @@ import PromotionDialog from './components/PromotionDialog'
 import PlayerNameEditor from './components/PlayerNameEditor'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
+import { getBoardColors } from './utils/boardThemes'
 
 const DEFAULT_SETTINGS: GameSettings = {
   theme: 'dark',
+  boardTheme: 'classic',
   showCoordinates: true,
   showLegalMoves: true,
   showLastMove: true,
@@ -241,8 +243,8 @@ export default function App() {
                   showNotation: settings.showCoordinates,
                   squareStyles: customSquareStyles(),
                   arrows: bestMoveArrows(),
-                  darkSquareStyle: { backgroundColor: '#3d4a5c' },
-                  lightSquareStyle: { backgroundColor: '#dde3ec' },
+                  darkSquareStyle: { backgroundColor: getBoardColors(settings.boardTheme).dark },
+                  lightSquareStyle: { backgroundColor: getBoardColors(settings.boardTheme).light },
                   animationDurationInMs: 150,
                 }}
               />

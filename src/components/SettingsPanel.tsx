@@ -1,4 +1,5 @@
-import type { GameSettings } from '../types'
+import type { GameSettings, BoardTheme } from '../types'
+import { BOARD_THEMES } from '../utils/boardThemes'
 
 interface Props {
   settings: GameSettings
@@ -35,6 +36,24 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
         </div>
 
         <div className="divide-y divide-gray-700">
+          <div className="py-2">
+            <label className="text-sm text-gray-300 block mb-2">Board theme</label>
+            <div className="flex gap-2 flex-wrap">
+              {(Object.entries(BOARD_THEMES) as [BoardTheme, typeof BOARD_THEMES[BoardTheme]][]).map(([key, t]) => (
+                <button
+                  key={key}
+                  onClick={() => update('boardTheme', key)}
+                  title={t.label}
+                  className={`flex gap-0.5 rounded overflow-hidden ring-2 transition-all ${
+                    settings.boardTheme === key ? 'ring-blue-500 scale-110' : 'ring-transparent'
+                  }`}
+                >
+                  <div className="w-5 h-5" style={{ background: t.dark }} />
+                  <div className="w-5 h-5" style={{ background: t.light }} />
+                </button>
+              ))}
+            </div>
+          </div>
           <Toggle label="Show coordinates" value={settings.showCoordinates} onChange={v => update('showCoordinates', v)} />
           <Toggle label="Show legal moves" value={settings.showLegalMoves} onChange={v => update('showLegalMoves', v)} />
           <Toggle label="Show last move" value={settings.showLastMove} onChange={v => update('showLastMove', v)} />
