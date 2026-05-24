@@ -42,7 +42,10 @@ export function useStockfish(depth = 18, multiPV = 3) {
         const mate = mateMatch ? parseInt(mateMatch[1]) : null
 
         if (lineDepth > 0 && moves.length > 0) {
-          pendingLines.current.set(pvIndex, { moves, score, mate, depth: lineDepth })
+          const existing = pendingLines.current.get(pvIndex)
+          if (!existing || lineDepth >= existing.depth) {
+            pendingLines.current.set(pvIndex, { moves, score, mate, depth: lineDepth })
+          }
         }
       }
 
