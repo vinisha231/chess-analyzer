@@ -271,8 +271,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex gap-4 p-4 max-w-[1200px] mx-auto w-full overflow-hidden">
-        <div className="flex gap-3 items-start shrink-0">
+      <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-[1200px] mx-auto w-full overflow-auto lg:overflow-hidden">
+        <div className="flex gap-3 items-start shrink-0 mx-auto lg:mx-0">
           <EvaluationBar
             evaluation={sfResult.evaluation}
             mate={sfResult.mate}
