@@ -1,6 +1,7 @@
 export type PieceColor = 'w' | 'b'
 export type GameMode = 'pvp' | 'analysis'
 export type ThemeMode = 'dark' | 'light'
+export type BoardTheme = 'classic' | 'ocean' | 'forest' | 'walnut' | 'rose'
 
 export interface MoveClassification {
   label: 'brilliant' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'
@@ -54,6 +55,7 @@ export interface PlayerInfo {
 
 export interface GameSettings {
   theme: ThemeMode
+  boardTheme: BoardTheme
   showCoordinates: boolean
   showLegalMoves: boolean
   showLastMove: boolean
