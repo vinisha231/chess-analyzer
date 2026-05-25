@@ -19,6 +19,7 @@ import MaterialBar from './components/MaterialBar'
 import MoveNavigator from './components/MoveNavigator'
 import ChessComPanel from './components/ChessComPanel'
 import GameReviewBanner from './components/GameReviewBanner'
+import ShortcutsModal from './components/ShortcutsModal'
 import { useChessCom } from './hooks/useChessCom'
 import type { ChessComGame } from './utils/chesscomApi'
 import type { GameSettings } from './types'
@@ -62,6 +63,7 @@ export default function App() {
   const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null)
   const [gameMode, setGameMode] = useState<'pvp' | 'analysis'>('pvp')
   const [reviewingGame, setReviewingGame] = useState<ChessComGame | null>(null)
+  const [showShortcuts, setShowShortcuts] = useState(false)
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -223,6 +225,7 @@ export default function App() {
       if (e.key === 'ArrowUp') goToMove(0)
       if (e.key === 'ArrowDown') goToMove(gameState.moveHistory.length - 1)
       if (e.key === 'f' || e.key === 'F') setFlipped(f => !f)
+      if (e.key === '?') setShowShortcuts(s => !s)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
@@ -426,8 +429,14 @@ export default function App() {
 
           <div className="shrink-0 bg-gray-800/30 rounded-xl px-3 py-2 text-xs text-gray-500 flex items-center justify-between">
             <div>
-              <span className="font-medium text-gray-400">Shortcuts: </span>
-              ← → navigate · ↑↓ first/last · F flip
+              <button
+                onClick={() => setShowShortcuts(true)}
+                className="font-medium text-gray-400 hover:text-gray-200 transition-colors"
+                title="View all keyboard shortcuts"
+              >
+                ⌨ Shortcuts
+              </button>
+              <span className="ml-2">← → navigate · ↑↓ first/last · F flip · ? help</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-gray-600">{phaseLabel(gamePhase)}</span>
@@ -472,6 +481,7 @@ export default function App() {
           onClose={() => setShowSettings(false)}
         />
       )}
+      {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
       {showPGN && (
         <PGNPanel
           pgn={gameState.pgn}
