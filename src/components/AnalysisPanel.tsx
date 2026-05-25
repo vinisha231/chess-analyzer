@@ -5,6 +5,8 @@ import { evalToDisplay } from '../utils/evaluation'
 interface Props {
   result: StockfishResult
   currentFen: string
+  onAnalyze?: () => void
+  autoAnalysis?: boolean
 }
 
 function uciLineToPretty(moves: string[], startFen: string): string {
@@ -25,7 +27,7 @@ function uciLineToPretty(moves: string[], startFen: string): string {
   }
 }
 
-export default function AnalysisPanel({ result, currentFen }: Props) {
+export default function AnalysisPanel({ result, currentFen, onAnalyze, autoAnalysis = true }: Props) {
   const { lines, isCalculating, depth } = result
   const MAX_DEPTH = 20
   const depthPct = Math.min(100, (depth / MAX_DEPTH) * 100)
@@ -45,6 +47,14 @@ export default function AnalysisPanel({ result, currentFen }: Props) {
           )}
           {!isCalculating && depth > 0 && (
             <span className="text-xs text-gray-500">depth {depth} ✓</span>
+          )}
+          {!autoAnalysis && !isCalculating && onAnalyze && (
+            <button
+              onClick={onAnalyze}
+              className="text-xs px-2 py-0.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors"
+            >
+              Analyze
+            </button>
           )}
         </div>
       </div>
