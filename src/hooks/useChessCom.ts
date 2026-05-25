@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   fetchProfile, fetchStats, fetchGames,
   type ChessComProfile, type ChessComStats, type ChessComGame,
@@ -31,6 +31,12 @@ export function useChessCom() {
     selectedMonth: now.getMonth() + 1,
   })
 
+  // Auto-reconnect if username was saved from last session
+  useEffect(() => {
+    const saved = localStorage.getItem('chesscom-username')
+    if (saved) connect(saved)
+  }, [])
+
   const connect = useCallback(async (username: string) => {
     setState(prev => ({ ...prev, connectionState: 'loading', error: null }))
     try {
@@ -38,6 +44,7 @@ export function useChessCom() {
         fetchProfile(username),
         fetchStats(username),
       ])
+      localStorage.setItem('chesscom-username', username.toLowerCase())
       setState(prev => ({
         ...prev,
         connectionState: 'connected',
@@ -69,6 +76,7 @@ export function useChessCom() {
   }, [])
 
   const disconnect = useCallback(() => {
+    localStorage.removeItem('chesscom-username')
     setState({
       connectionState: 'idle',
       error: null,
