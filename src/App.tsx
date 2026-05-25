@@ -144,13 +144,21 @@ export default function App() {
   }
 
   const bestMoveArrows = useCallback(() => {
-    if (!settings.showBestMoveArrow || !sfResult.bestMove || sfResult.bestMove.length < 4) return []
-    return [{
-      startSquare: sfResult.bestMove.slice(0, 2),
-      endSquare: sfResult.bestMove.slice(2, 4),
-      color: 'rgba(99,102,241,0.75)',
-    }]
-  }, [sfResult.bestMove, settings.showBestMoveArrow])
+    if (!settings.showBestMoveArrow) return []
+    const arrowColors = [
+      'rgba(99,102,241,0.80)',   // indigo — best move
+      'rgba(34,197,94,0.55)',    // green — 2nd best
+      'rgba(251,191,36,0.45)',   // amber — 3rd best
+    ]
+    return sfResult.lines
+      .slice(0, 3)
+      .filter(line => line.moves[0] && line.moves[0].length >= 4)
+      .map((line, i) => ({
+        startSquare: line.moves[0].slice(0, 2),
+        endSquare: line.moves[0].slice(2, 4),
+        color: arrowColors[i],
+      }))
+  }, [sfResult.lines, settings.showBestMoveArrow])
 
   function isPromotionMove(from: string, to: string): boolean {
     const piece = game.chess.current.get(from as any)
