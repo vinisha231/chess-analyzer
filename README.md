@@ -1,4 +1,4 @@
-# Chess Analyzer
+# Chess Analyzer https://vinisha231.github.io/chess-analyzer/
 
 A full-featured chess game analyzer built with React, TypeScript, and Stockfish 18.
 
