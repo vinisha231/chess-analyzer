@@ -37,19 +37,26 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
 
         <div className="divide-y divide-gray-700">
           <div className="py-2">
-            <label className="text-sm text-gray-300 block mb-2">Board theme</label>
+            <label className="text-sm text-gray-300 block mb-2">
+              Board theme — <span className="text-blue-400">{BOARD_THEMES[settings.boardTheme].label}</span>
+            </label>
             <div className="flex gap-2 flex-wrap">
               {(Object.entries(BOARD_THEMES) as [BoardTheme, typeof BOARD_THEMES[BoardTheme]][]).map(([key, t]) => (
                 <button
                   key={key}
                   onClick={() => update('boardTheme', key)}
                   title={t.label}
-                  className={`flex gap-0.5 rounded overflow-hidden ring-2 transition-all ${
-                    settings.boardTheme === key ? 'ring-blue-500 scale-110' : 'ring-transparent'
+                  className={`flex flex-col items-center gap-0.5 transition-all group ${
+                    settings.boardTheme === key ? 'scale-110' : 'opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <div className="w-5 h-5" style={{ background: t.dark }} />
-                  <div className="w-5 h-5" style={{ background: t.light }} />
+                  <div className={`flex gap-0.5 rounded overflow-hidden ring-2 transition-all ${
+                    settings.boardTheme === key ? 'ring-blue-500' : 'ring-transparent group-hover:ring-gray-500'
+                  }`}>
+                    <div className="w-6 h-6" style={{ background: t.dark }} />
+                    <div className="w-6 h-6" style={{ background: t.light }} />
+                  </div>
+                  <span className="text-[10px] text-gray-500">{t.label}</span>
                 </button>
               ))}
             </div>
