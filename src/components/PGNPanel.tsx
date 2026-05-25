@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { downloadPGN, parseFEN } from '../utils/pgn'
 
 interface Props {
@@ -13,6 +13,14 @@ export default function PGNPanel({ pgn, onImportPGN, onImportFEN, onClose }: Pro
   const [importText, setImportText] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(pgn).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    })
+  }, [pgn])
 
   const handleImport = () => {
     setError('')
@@ -61,10 +69,12 @@ export default function PGNPanel({ pgn, onImportPGN, onImportFEN, onClose }: Pro
             />
             <div className="flex gap-2 mt-3">
               <button
-                onClick={() => navigator.clipboard.writeText(pgn)}
-                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg text-sm font-medium transition-colors"
+                onClick={handleCopy}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  copied ? 'bg-green-700 text-green-200' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                }`}
               >
-                Copy
+                {copied ? '✓ Copied!' : 'Copy'}
               </button>
               <button
                 onClick={() => downloadPGN(pgn, `game-${Date.now()}.pgn`)}
