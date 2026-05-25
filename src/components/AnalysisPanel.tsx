@@ -27,6 +27,8 @@ function uciLineToPretty(moves: string[], startFen: string): string {
 
 export default function AnalysisPanel({ result, currentFen }: Props) {
   const { lines, isCalculating, depth } = result
+  const MAX_DEPTH = 20
+  const depthPct = Math.min(100, (depth / MAX_DEPTH) * 100)
 
   return (
     <div className="flex flex-col gap-2">
@@ -38,14 +40,23 @@ export default function AnalysisPanel({ result, currentFen }: Props) {
           {isCalculating && (
             <span className="flex items-center gap-1 text-xs text-blue-400">
               <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
-              Calculating…
+              depth {depth > 0 ? depth : '…'}
             </span>
           )}
           {!isCalculating && depth > 0 && (
-            <span className="text-xs text-gray-500">depth {depth}</span>
+            <span className="text-xs text-gray-500">depth {depth} ✓</span>
           )}
         </div>
       </div>
+
+      {(isCalculating || depth > 0) && (
+        <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${isCalculating ? 'bg-blue-500' : 'bg-green-500'}`}
+            style={{ width: `${depthPct}%` }}
+          />
+        </div>
+      )}
 
       <div className="flex flex-col gap-1">
         {lines.length === 0 && !isCalculating && (
