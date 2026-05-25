@@ -20,7 +20,6 @@ function analyzeGames(games: ChessComGame[], username: string): Tip[] {
 
   const results = games.map(g => getResultForPlayer(g, lc))
   const wins = results.filter(r => r === 'win').length
-  const losses = results.filter(r => r === 'loss').length
   const draws = results.filter(r => r === 'draw').length
   const total = games.length
   const winRate = wins / total

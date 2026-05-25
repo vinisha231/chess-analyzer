@@ -17,6 +17,8 @@ import PlayerNameEditor from './components/PlayerNameEditor'
 import PositionInfo from './components/PositionInfo'
 import MaterialBar from './components/MaterialBar'
 import MoveNavigator from './components/MoveNavigator'
+import ChessComPanel from './components/ChessComPanel'
+import { useChessCom } from './hooks/useChessCom'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
@@ -50,7 +52,7 @@ export default function App() {
   const [flipped, setFlipped] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showPGN, setShowPGN] = useState(false)
-  const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats'>('analysis')
+  const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats' | 'chesscom'>('analysis')
   const [playerNames, setPlayerNames] = useState({ white: 'White', black: 'Black' })
   const [showNameEditor, setShowNameEditor] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
@@ -61,6 +63,7 @@ export default function App() {
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
   const timer = useTimer(settings.timeControl, settings.enableTimer)
+  const chessCom = useChessCom()
 
   const { gameState, capturedPieces, makeMove, undoMove, resetGame, goToMove, loadFromFEN, loadFromPGN } = game
 
@@ -350,16 +353,24 @@ export default function App() {
         </div>
 
         <div className="flex-1 min-w-0 flex flex-col gap-3">
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-1 shrink-0">
-            {(['analysis', 'history', 'stats'] as const).map(tab => (
+          <div className="flex gap-1 bg-gray-800 rounded-lg p-1 shrink-0 flex-wrap">
+            {([
+              ['analysis', '⚡ Analysis'],
+              ['history',  '📋 Moves'],
+              ['stats',    '📊 Stats'],
+              ['chesscom', '♟ chess.com'],
+            ] as const).map(([tab, label]) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
                   activeTab === tab ? 'bg-gray-600 text-white' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                {tab === 'analysis' ? '⚡ Analysis' : tab === 'history' ? '📋 Moves' : '📊 Stats'}
+                {label}
+                {tab === 'chesscom' && chessCom.connectionState === 'connected' && (
+                  <span className="ml-1 inline-block w-1.5 h-1.5 bg-green-400 rounded-full" />
+                )}
               </button>
             ))}
           </div>
@@ -375,6 +386,15 @@ export default function App() {
             )}
             {activeTab === 'stats' && (
               <GameStats moves={gameState.moveHistory} playerNames={playerNames} />
+            )}
+            {activeTab === 'chesscom' && (
+              <ChessComPanel
+                {...chessCom}
+                onImportGame={pgn => {
+                  loadFromPGN(pgn)
+                  setActiveTab('history')
+                }}
+              />
             )}
           </div>
 
