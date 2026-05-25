@@ -403,8 +403,13 @@ export default function App() {
                 {...chessCom}
                 onImportGame={pgn => {
                   loadFromPGN(pgn)
-                  const game = chessCom.games.find(g => g.pgn === pgn) ?? null
-                  setReviewingGame(game)
+                  const imported = chessCom.games.find(g => g.pgn === pgn) ?? null
+                  setReviewingGame(imported)
+                  // Auto-flip board so the user's color is always on the bottom
+                  if (imported && chessCom.profile) {
+                    const userIsBlack = imported.black.username.toLowerCase() === chessCom.profile.username.toLowerCase()
+                    setFlipped(userIsBlack)
+                  }
                   setActiveTab('history')
                 }}
               />
