@@ -1,5 +1,5 @@
 import type { ChessComGame } from '../utils/chesscomApi'
-import { getResultForPlayer, formatTimeControl, getOpeningFromPGN } from '../utils/chesscomApi'
+import { getResultForPlayer, formatTimeControl, getOpeningFromPGN, getECOCodeFromPGN } from '../utils/chesscomApi'
 
 interface Props {
   game: ChessComGame | null
@@ -15,7 +15,9 @@ export default function GameReviewBanner({ game, username, onClear }: Props) {
   const opp = isWhite ? game.black : game.white
   const result = getResultForPlayer(game, username)
   const accuracy = game.accuracies ? (isWhite ? game.accuracies.white : game.accuracies.black) : null
+  const oppAccuracy = game.accuracies ? (isWhite ? game.accuracies.black : game.accuracies.white) : null
   const opening = getOpeningFromPGN(game.pgn)
+  const eco = getECOCodeFromPGN(game.pgn)
 
   const resultColor = result === 'win' ? 'text-green-400' : result === 'loss' ? 'text-red-400' : 'text-gray-400'
   const resultLabel = result === 'win' ? 'Won' : result === 'loss' ? 'Lost' : 'Draw'
@@ -33,12 +35,20 @@ export default function GameReviewBanner({ game, username, onClear }: Props) {
             <>
               <span className="text-gray-600">·</span>
               <span className={accuracy >= 85 ? 'text-green-400' : accuracy >= 70 ? 'text-yellow-400' : 'text-red-400'}>
-                {accuracy.toFixed(0)}% accuracy
+                You {accuracy.toFixed(0)}%
               </span>
+              {oppAccuracy !== null && (
+                <span className="text-gray-500">vs {oppAccuracy.toFixed(0)}%</span>
+              )}
             </>
           )}
         </div>
-        {opening && <p className="text-gray-500 truncate mt-0.5">{opening}</p>}
+        {opening && (
+          <p className="text-gray-500 truncate mt-0.5">
+            {eco && <span className="text-gray-600 font-mono mr-1">{eco}</span>}
+            {opening}
+          </p>
+        )}
       </div>
       <button onClick={onClear} className="text-gray-600 hover:text-gray-300 transition-colors shrink-0 text-base leading-none">×</button>
     </div>

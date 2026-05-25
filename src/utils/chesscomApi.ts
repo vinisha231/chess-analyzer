@@ -91,3 +91,8 @@ export function getOpeningFromPGN(pgn: string): string {
   if (!match) return ''
   return match[1].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
+
+export function getECOCodeFromPGN(pgn: string): string {
+  const match = pgn.match(/\[ECO "([A-E]\d{2})"\]/)
+  return match ? match[1] : ''
+}
