@@ -69,9 +69,19 @@ export default function GameImportCard({ game, username, onImport }: Props) {
         <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${RESULT_STYLE[result]}`}>
           {RESULT_LABEL[result]}
         </span>
+        <a
+          href={game.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-600 hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100 text-base leading-none"
+          title="Open on chess.com"
+          onClick={e => e.stopPropagation()}
+        >
+          ↗
+        </a>
         <button
           onClick={() => onImport(game.pgn)}
-          className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded opacity-0 group-hover:opacity-100 transition-all font-medium"
+          className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors font-medium"
         >
           Analyze
         </button>
