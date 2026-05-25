@@ -36,6 +36,7 @@ export default function ChessComPanel({
   const [subTab, setSubTab] = useState<SubTab>('games')
   const [filter, setFilter] = useState<Filter>('all')
   const [resultFilter, setResultFilter] = useState<ResultFilter>('all')
+  const [opponentSearch, setOpponentSearch] = useState('')
 
   // Auto-load current month when connected
   useEffect(() => {
@@ -45,9 +46,18 @@ export default function ChessComPanel({
   }, [connectionState, profile])
 
   const timeFiltered = filter === 'all' ? games : games.filter(g => g.time_class === filter)
-  const filteredGames = resultFilter === 'all'
+  const resultFiltered = resultFilter === 'all'
     ? timeFiltered
     : timeFiltered.filter(g => profile && getResultForPlayer(g, profile.username) === resultFilter)
+  const filteredGames = opponentSearch.trim()
+    ? resultFiltered.filter(g => {
+        const query = opponentSearch.toLowerCase()
+        const opp = profile
+          ? (g.white.username.toLowerCase() === profile.username.toLowerCase() ? g.black : g.white)
+          : g.black
+        return opp.username.toLowerCase().includes(query)
+      })
+    : resultFiltered
 
   if (connectionState !== 'connected') {
     return (
@@ -134,6 +144,24 @@ export default function ChessComPanel({
               <span className="ml-auto text-xs text-gray-500 self-center">
                 {filteredGames.length} games
               </span>
+            )}
+          </div>
+
+          <div className="shrink-0 relative">
+            <input
+              type="text"
+              placeholder="Search by opponent…"
+              value={opponentSearch}
+              onChange={e => setOpponentSearch(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500 pr-7"
+            />
+            {opponentSearch && (
+              <button
+                onClick={() => setOpponentSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-base leading-none"
+              >
+                ×
+              </button>
             )}
           </div>
 
