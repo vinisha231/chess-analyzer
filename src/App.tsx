@@ -20,6 +20,7 @@ import MoveNavigator from './components/MoveNavigator'
 import ChessComPanel from './components/ChessComPanel'
 import GameReviewBanner from './components/GameReviewBanner'
 import ShortcutsModal from './components/ShortcutsModal'
+import Toast from './components/Toast'
 import { useChessCom } from './hooks/useChessCom'
 import type { ChessComGame } from './utils/chesscomApi'
 import type { GameSettings } from './types'
@@ -64,6 +65,7 @@ export default function App() {
   const [gameMode, setGameMode] = useState<'pvp' | 'analysis'>('pvp')
   const [reviewingGame, setReviewingGame] = useState<ChessComGame | null>(null)
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -241,7 +243,7 @@ export default function App() {
   const gamePhase = detectGamePhase(gameState.fen, gameState.moveHistory.length)
 
   function copyFEN() {
-    navigator.clipboard.writeText(gameState.fen)
+    navigator.clipboard.writeText(gameState.fen).then(() => setToast('FEN copied to clipboard'))
   }
 
   return (
@@ -482,11 +484,12 @@ export default function App() {
         />
       )}
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showPGN && (
         <PGNPanel
           pgn={gameState.pgn}
-          onImportPGN={pgn => { const ok = loadFromPGN(pgn); if (ok) setShowPGN(false); return ok }}
-          onImportFEN={fen => { const ok = loadFromFEN(fen); if (ok) setShowPGN(false); return ok }}
+          onImportPGN={pgn => { const ok = loadFromPGN(pgn); if (ok) { setShowPGN(false); setToast('PGN loaded') } return ok }}
+          onImportFEN={fen => { const ok = loadFromFEN(fen); if (ok) { setShowPGN(false); setToast('Position loaded from FEN') } return ok }}
           onClose={() => setShowPGN(false)}
         />
       )}
