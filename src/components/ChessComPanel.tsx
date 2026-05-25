@@ -4,6 +4,7 @@ import GameImportCard from './GameImportCard'
 import MonthPicker from './MonthPicker'
 import ImprovementTips from './ImprovementTips'
 import type { useChessCom } from '../hooks/useChessCom'
+import { getResultForPlayer } from '../utils/chesscomApi'
 
 type ChessComHook = ReturnType<typeof useChessCom>
 
@@ -16,6 +17,16 @@ type SubTab = 'games' | 'tips'
 const TIME_CLASS_FILTERS = ['all', 'bullet', 'blitz', 'rapid', 'daily'] as const
 type Filter = typeof TIME_CLASS_FILTERS[number]
 
+const RESULT_FILTERS = ['all', 'win', 'loss', 'draw'] as const
+type ResultFilter = typeof RESULT_FILTERS[number]
+
+const RESULT_FILTER_STYLE: Record<ResultFilter, string> = {
+  all:  'bg-gray-700 text-gray-400 hover:text-white',
+  win:  'bg-green-900/50 text-green-400 hover:text-green-300',
+  loss: 'bg-red-900/50 text-red-400 hover:text-red-300',
+  draw: 'bg-gray-700 text-gray-400 hover:text-white',
+}
+
 export default function ChessComPanel({
   connectionState, profile, stats, error, games, gamesLoading,
   selectedYear, selectedMonth,
@@ -24,6 +35,7 @@ export default function ChessComPanel({
 }: Props) {
   const [subTab, setSubTab] = useState<SubTab>('games')
   const [filter, setFilter] = useState<Filter>('all')
+  const [resultFilter, setResultFilter] = useState<ResultFilter>('all')
 
   // Auto-load current month when connected
   useEffect(() => {
@@ -32,7 +44,10 @@ export default function ChessComPanel({
     }
   }, [connectionState, profile])
 
-  const filteredGames = filter === 'all' ? games : games.filter(g => g.time_class === filter)
+  const timeFiltered = filter === 'all' ? games : games.filter(g => g.time_class === filter)
+  const filteredGames = resultFilter === 'all'
+    ? timeFiltered
+    : timeFiltered.filter(g => profile && getResultForPlayer(g, profile.username) === resultFilter)
 
   if (connectionState !== 'connected') {
     return (
@@ -95,6 +110,24 @@ export default function ChessComPanel({
                 }`}
               >
                 {f}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-1 flex-wrap shrink-0 items-center">
+            {RESULT_FILTERS.map(r => (
+              <button
+                key={r}
+                onClick={() => setResultFilter(r)}
+                className={`px-2 py-0.5 rounded text-xs font-medium transition-colors capitalize ${
+                  resultFilter === r
+                    ? r === 'win' ? 'bg-green-700 text-white'
+                      : r === 'loss' ? 'bg-red-700 text-white'
+                      : 'bg-gray-600 text-white'
+                    : RESULT_FILTER_STYLE[r]
+                }`}
+              >
+                {r === 'all' ? 'All results' : r === 'win' ? '✓ Won' : r === 'loss' ? '✗ Lost' : '= Draw'}
               </button>
             ))}
             {games.length > 0 && (
