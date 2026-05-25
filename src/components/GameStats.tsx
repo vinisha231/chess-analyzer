@@ -39,17 +39,32 @@ export default function GameStats({ moves, playerNames }: Props) {
     )
   }
 
+  const accColor = (acc: number) =>
+    acc >= 90 ? 'text-green-400' : acc >= 75 ? 'text-yellow-400' : 'text-red-400'
+
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex gap-3">
-        <div className="flex-1 text-center">
-          <p className="text-lg font-bold text-white">{whiteAcc.toFixed(0)}%</p>
-          <p className="text-xs text-gray-400">{playerNames.white}</p>
+      {/* Accuracy */}
+      <div className="bg-gray-800/60 rounded-lg px-3 py-2">
+        <p className="text-xs text-gray-500 text-center mb-2">Accuracy</p>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 text-right">
+            <span className={`text-2xl font-bold font-mono ${accColor(whiteAcc)}`}>{whiteAcc.toFixed(0)}<span className="text-base">%</span></span>
+            <p className="text-xs text-gray-400 mt-0.5">{playerNames.white}</p>
+          </div>
+          <div className="w-px h-10 bg-gray-700 shrink-0" />
+          <div className="flex-1 text-left">
+            <span className={`text-2xl font-bold font-mono ${accColor(blackAcc)}`}>{blackAcc.toFixed(0)}<span className="text-base">%</span></span>
+            <p className="text-xs text-gray-400 mt-0.5">{playerNames.black}</p>
+          </div>
         </div>
-        <div className="text-xs text-gray-500 self-center">accuracy</div>
-        <div className="flex-1 text-center">
-          <p className="text-lg font-bold text-white">{blackAcc.toFixed(0)}%</p>
-          <p className="text-xs text-gray-400">{playerNames.black}</p>
+        {/* Relative accuracy bar */}
+        <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden flex">
+          <div
+            className="h-full bg-white transition-all duration-700"
+            style={{ width: `${(whiteAcc / (whiteAcc + blackAcc)) * 100}%` }}
+          />
+          <div className="h-full bg-gray-500 flex-1" />
         </div>
       </div>
 
