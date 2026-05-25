@@ -18,7 +18,9 @@ import PositionInfo from './components/PositionInfo'
 import MaterialBar from './components/MaterialBar'
 import MoveNavigator from './components/MoveNavigator'
 import ChessComPanel from './components/ChessComPanel'
+import GameReviewBanner from './components/GameReviewBanner'
 import { useChessCom } from './hooks/useChessCom'
+import type { ChessComGame } from './utils/chesscomApi'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
@@ -59,6 +61,7 @@ export default function App() {
   const [showResultModal, setShowResultModal] = useState(false)
   const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null)
   const [gameMode, setGameMode] = useState<'pvp' | 'analysis'>('pvp')
+  const [reviewingGame, setReviewingGame] = useState<ChessComGame | null>(null)
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -375,6 +378,14 @@ export default function App() {
             ))}
           </div>
 
+          {reviewingGame && chessCom.profile && (
+            <GameReviewBanner
+              game={reviewingGame}
+              username={chessCom.profile.username}
+              onClear={() => setReviewingGame(null)}
+            />
+          )}
+
           <div className="flex-1 bg-gray-800/50 rounded-xl p-3 overflow-hidden flex flex-col min-h-0">
             {activeTab === 'analysis' && <AnalysisPanel result={sfResult} currentFen={gameState.fen} />}
             {activeTab === 'history' && (
@@ -392,6 +403,8 @@ export default function App() {
                 {...chessCom}
                 onImportGame={pgn => {
                   loadFromPGN(pgn)
+                  const game = chessCom.games.find(g => g.pgn === pgn) ?? null
+                  setReviewingGame(game)
                   setActiveTab('history')
                 }}
               />

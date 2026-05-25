@@ -12,7 +12,6 @@ export default function GameReviewBanner({ game, username, onClear }: Props) {
 
   const lc = username.toLowerCase()
   const isWhite = game.white.username.toLowerCase() === lc
-  const me = isWhite ? game.white : game.black
   const opp = isWhite ? game.black : game.white
   const result = getResultForPlayer(game, username)
   const accuracy = game.accuracies ? (isWhite ? game.accuracies.white : game.accuracies.black) : null
