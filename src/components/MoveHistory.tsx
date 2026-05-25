@@ -18,6 +18,40 @@ const QUALITY_SUMMARY = [
   { label: 'inaccuracy',emoji: '?!', color: 'text-yellow-400', title: 'Inaccuracies' },
 ]
 
+const BAD_LABELS = new Set(['blunder', 'mistake', 'inaccuracy'])
+
+function BlunderNav({ moves, currentIndex, onJump }: Props) {
+  const badIndices = moves
+    .map((m, i) => (m.classification && BAD_LABELS.has(m.classification.label) ? i : -1))
+    .filter(i => i >= 0)
+
+  if (badIndices.length === 0) return null
+
+  const prevBad = [...badIndices].reverse().find(i => i < currentIndex)
+  const nextBad = badIndices.find(i => i > currentIndex)
+
+  return (
+    <div className="ml-auto flex items-center gap-1">
+      <button
+        onClick={() => prevBad !== undefined && onJump(prevBad)}
+        disabled={prevBad === undefined}
+        title="Previous mistake/blunder"
+        className="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-default transition-colors"
+      >
+        ‹ mistake
+      </button>
+      <button
+        onClick={() => nextBad !== undefined && onJump(nextBad)}
+        disabled={nextBad === undefined}
+        title="Next mistake/blunder"
+        className="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-default transition-colors"
+      >
+        mistake ›
+      </button>
+    </div>
+  )
+}
+
 export default function MoveHistory({ moves, currentIndex, onJump }: Props) {
   const activeRef = useRef<HTMLButtonElement>(null)
 
@@ -39,7 +73,7 @@ export default function MoveHistory({ moves, currentIndex, onJump }: Props) {
       </div>
 
       {hasClassifications && (
-        <div className="flex gap-3 px-2 py-1.5 border-b border-gray-800 flex-wrap">
+        <div className="flex items-center gap-3 px-2 py-1.5 border-b border-gray-800 flex-wrap">
           {QUALITY_SUMMARY.map(({ label, emoji, color, title }) => {
             const count = countClassification(moves, label)
             if (count === 0) return null
@@ -50,6 +84,7 @@ export default function MoveHistory({ moves, currentIndex, onJump }: Props) {
               </span>
             )
           })}
+          <BlunderNav moves={moves} currentIndex={currentIndex} onJump={onJump} />
         </div>
       )}
       <div className="flex-1 overflow-y-auto">
