@@ -1,4 +1,5 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
+import { SoundEngine } from '../../utils/soundEngine'
 import { Chessboard } from 'react-chessboard'
 import type { ChessOpening } from '../../types/openings'
 import type { UseLearnerResult } from '../../hooks/useOpeningLearner'
@@ -22,6 +23,17 @@ export default function OpeningQuiz({ opening, learner, boardSize = 360, onCompl
   const expectedMoveIdx = currentMoveIdx + 1
   const isUserTurn = expectedMoveIdx < totalMoves
   const expectedMove = isUserTurn ? opening.moves[expectedMoveIdx] : null
+
+  // Play sounds on feedback
+  useEffect(() => {
+    if (quizFeedback === 'correct') SoundEngine.move()
+    if (quizFeedback === 'wrong') SoundEngine.check()
+  }, [quizFeedback])
+
+  // Play game-end sound on completion
+  useEffect(() => {
+    if (isComplete) SoundEngine.gameEnd()
+  }, [isComplete])
 
   const handleDrop = useCallback(({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string }) => {
     if (!isUserTurn || isComplete) return false
