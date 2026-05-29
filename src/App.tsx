@@ -21,6 +21,7 @@ import ChessComPanel from './components/ChessComPanel'
 import GameReviewBanner from './components/GameReviewBanner'
 import ShortcutsModal from './components/ShortcutsModal'
 import Toast from './components/Toast'
+import OpeningsPanel from './components/openings/OpeningsPanel'
 import { useChessCom } from './hooks/useChessCom'
 import type { ChessComGame } from './utils/chesscomApi'
 import type { GameSettings } from './types'
@@ -56,7 +57,7 @@ export default function App() {
   const [flipped, setFlipped] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showPGN, setShowPGN] = useState(false)
-  const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats' | 'chesscom'>('analysis')
+  const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats' | 'chesscom' | 'openings'>('analysis')
   const [playerNames, setPlayerNames] = useState({ white: 'White', black: 'Black' })
   const [showNameEditor, setShowNameEditor] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
@@ -374,6 +375,7 @@ export default function App() {
               ['analysis', '⚡ Analysis'],
               ['history',  '📋 Moves'],
               ['stats',    '📊 Stats'],
+              ['openings', '📖 Openings'],
               ['chesscom', '♟ chess.com'],
             ] as const).map(([tab, label]) => (
               <button
@@ -418,6 +420,7 @@ export default function App() {
             {activeTab === 'stats' && (
               <GameStats moves={gameState.moveHistory} playerNames={playerNames} />
             )}
+            {activeTab === 'openings' && <OpeningsPanel boardSize={480} />}
             {activeTab === 'chesscom' && (
               <ChessComPanel
                 {...chessCom}
