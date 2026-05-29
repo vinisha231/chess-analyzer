@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function OpeningLesson({ opening, learner, boardSize = 360, onStartQuiz, onBack }: Props) {
-  const { currentFen, currentMoveIdx, totalMoves, isComplete, nextMove, prevMove } = learner
+  const { currentFen, currentMoveIdx, totalMoves, isComplete, nextMove, prevMove, jumpToMove } = learner
 
   const currentMove = opening.moves[currentMoveIdx]
   const nextMoveData = opening.moves[currentMoveIdx + 1]
@@ -135,12 +135,7 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
         <OpeningMoveList
           opening={opening}
           currentMoveIdx={currentMoveIdx}
-          onJump={(i) => {
-            // Jump to index by calling nextMove repeatedly or prevMove
-            const diff = i - currentMoveIdx
-            if (diff > 0) for (let j = 0; j < diff; j++) nextMove()
-            else for (let j = 0; j > diff; j--) prevMove()
-          }}
+          onJump={jumpToMove}
         />
         {/* Key ideas */}
         {opening.keyIdeas.length > 0 && (

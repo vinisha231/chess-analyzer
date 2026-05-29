@@ -117,6 +117,17 @@ export function useOpeningLearner(): UseLearnerResult {
     return chess.moves({ verbose: true }).map(m => `${m.from}${m.to}${m.promotion ?? ''}`)
   }, [currentFen])
 
+  const jumpToMove = useCallback((index: number) => {
+    if (!openingRef.current) return
+    const opening = openingRef.current
+    const targetIdx = Math.max(-1, Math.min(index, opening.moves.length - 1))
+    const fen = targetIdx < 0 ? STARTING_FEN : buildFenAtIndex(opening, targetIdx)
+    setCurrentFen(fen)
+    setSession(s => s ? { ...s, currentMoveIndex: targetIdx } : s)
+    setQuizFeedback(null)
+    setWrongMove(null)
+  }, [buildFenAtIndex])
+
   const resetSession = useCallback(() => {
     setSession(null)
     setCurrentFen(STARTING_FEN)
@@ -144,6 +155,7 @@ export function useOpeningLearner(): UseLearnerResult {
     startQuiz,
     nextMove,
     prevMove,
+    jumpToMove,
     tryQuizMove,
     resetSession,
     getLegalMoves,
