@@ -13,9 +13,10 @@ type PanelTab = 'catalog' | 'stats'
 
 interface Props {
   boardSize?: number
+  onLoadPGN?: (pgn: string) => void
 }
 
-export default function OpeningsPanel({ boardSize = 320 }: Props) {
+export default function OpeningsPanel({ boardSize = 320, onLoadPGN }: Props) {
   const [view, setView] = useState<View>('catalog')
   const [activeTab, setActiveTab] = useState<PanelTab>('catalog')
   const [activeOpening, setActiveOpening] = useState<ChessOpening | null>(null)
@@ -67,6 +68,7 @@ export default function OpeningsPanel({ boardSize = 320 }: Props) {
         boardSize={boardSize}
         onStartQuiz={handleStartQuiz}
         onBack={handleBack}
+        onLoadIntoMainBoard={onLoadPGN}
       />
     )
   }

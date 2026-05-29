@@ -12,9 +12,10 @@ interface Props {
   boardSize?: number
   onStartQuiz: () => void
   onBack: () => void
+  onLoadIntoMainBoard?: (pgn: string) => void
 }
 
-export default function OpeningLesson({ opening, learner, boardSize = 360, onStartQuiz, onBack }: Props) {
+export default function OpeningLesson({ opening, learner, boardSize = 360, onStartQuiz, onBack, onLoadIntoMainBoard }: Props) {
   const { currentFen, currentMoveIdx, totalMoves, isComplete, nextMove, prevMove, jumpToMove } = learner
 
   // Keyboard navigation in lesson mode
@@ -67,12 +68,29 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
           </div>
           <h2 className="text-sm font-bold text-white truncate">{opening.name}</h2>
         </div>
-        <button
-          onClick={onStartQuiz}
-          className="shrink-0 text-xs px-2.5 py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors"
-        >
-          🧠 Quiz
-        </button>
+        <div className="flex gap-1 shrink-0">
+          {onLoadIntoMainBoard && (
+            <button
+              onClick={() => {
+                const pgn = opening.moves.map((m, i) => {
+                  const num = Math.floor(i / 2) + 1
+                  return i % 2 === 0 ? `${num}. ${m.san}` : m.san
+                }).join(' ')
+                onLoadIntoMainBoard(pgn)
+              }}
+              title="Load into main board for analysis"
+              className="shrink-0 text-xs px-2 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-medium transition-colors"
+            >
+              ♟ Analyze
+            </button>
+          )}
+          <button
+            onClick={onStartQuiz}
+            className="shrink-0 text-xs px-2.5 py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors"
+          >
+            🧠 Quiz
+          </button>
+        </div>
       </div>
 
       {/* Board */}

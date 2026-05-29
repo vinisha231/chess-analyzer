@@ -420,7 +420,16 @@ export default function App() {
             {activeTab === 'stats' && (
               <GameStats moves={gameState.moveHistory} playerNames={playerNames} />
             )}
-            {activeTab === 'openings' && <OpeningsPanel boardSize={480} />}
+            {activeTab === 'openings' && (
+              <OpeningsPanel
+                boardSize={480}
+                onLoadPGN={pgn => {
+                  loadFromPGN(pgn)
+                  setToast('Opening loaded into main board')
+                  setActiveTab('history')
+                }}
+              />
+            )}
             {activeTab === 'chesscom' && (
               <ChessComPanel
                 {...chessCom}
