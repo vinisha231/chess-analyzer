@@ -35,8 +35,8 @@ export default function OpeningQuiz({ opening, learner, boardSize = 360, onCompl
     if (isComplete) SoundEngine.gameEnd()
   }, [isComplete])
 
-  const handleDrop = useCallback(({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string }) => {
-    if (!isUserTurn || isComplete) return false
+  const handleDrop = useCallback(({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string | null }) => {
+    if (!isUserTurn || isComplete || !targetSquare) return false
     const uci = `${sourceSquare}${targetSquare}`
     tryQuizMove(uci)
     return true

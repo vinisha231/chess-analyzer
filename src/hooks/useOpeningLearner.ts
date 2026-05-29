@@ -18,6 +18,7 @@ export interface UseLearnerResult {
   startQuiz: (opening: ChessOpening) => void
   nextMove: () => void
   prevMove: () => void
+  jumpToMove: (index: number) => void
   tryQuizMove: (uci: string) => boolean
   resetSession: () => void
   getLegalMoves: () => string[]
