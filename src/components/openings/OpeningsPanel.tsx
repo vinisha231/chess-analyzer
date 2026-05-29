@@ -6,6 +6,7 @@ import OpeningCatalog from './OpeningCatalog'
 import OpeningLesson from './OpeningLesson'
 import OpeningQuiz from './OpeningQuiz'
 import OpeningStats from './OpeningStats'
+import DailyOpeningBanner from './DailyOpeningBanner'
 
 type View = 'catalog' | 'lesson' | 'quiz' | 'stats'
 type PanelTab = 'catalog' | 'stats'
@@ -102,13 +103,16 @@ export default function OpeningsPanel({ boardSize = 320 }: Props) {
       </div>
 
       {activeTab === 'catalog' && (
-        <OpeningCatalog
-          progress={progress.progress}
-          onLearn={handleLearn}
-          onQuiz={handleQuiz}
-          onToggleFavorite={progress.toggleFavorite}
-          isFavorite={progress.isFavorite}
-        />
+        <>
+          <DailyOpeningBanner onLearn={handleLearn} />
+          <OpeningCatalog
+            progress={progress.progress}
+            onLearn={handleLearn}
+            onQuiz={handleQuiz}
+            onToggleFavorite={progress.toggleFavorite}
+            isFavorite={progress.isFavorite}
+          />
+        </>
       )}
 
       {activeTab === 'stats' && (
