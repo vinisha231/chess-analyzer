@@ -2,6 +2,7 @@ import { openGames } from './openGames'
 import { semiOpenGames } from './semiOpenGames'
 import { closedGames } from './closedGames'
 import { flankOpenings } from './flankOpenings'
+import { moreOpenings } from './moreOpenings'
 import type { ChessOpening, OpeningCategory, OpeningDifficulty } from '../../types/openings'
 
 export const ALL_OPENINGS: ChessOpening[] = [
@@ -9,6 +10,7 @@ export const ALL_OPENINGS: ChessOpening[] = [
   ...semiOpenGames,
   ...closedGames,
   ...flankOpenings,
+  ...moreOpenings,
 ]
 
 export function getOpeningById(id: string): ChessOpening | undefined {
