@@ -1,0 +1,230 @@
+import type { ChessOpening } from '../../types/openings'
+
+export const closedGames: ChessOpening[] = [
+  {
+    id: 'queens-gambit',
+    eco: 'D06',
+    name: 'Queen\'s Gambit',
+    category: 'closed',
+    difficulty: 'beginner',
+    description: 'The most classical of all queen pawn openings. White offers a pawn to gain central control. Played by nearly every world champion, it remains razor-sharp at every level.',
+    moves: [
+      { uci: 'd2d4', san: 'd4',  explanation: 'White claims the center with the queen pawn.' },
+      { uci: 'd7d5', san: 'd5',  explanation: 'Black mirrors and contests the center.' },
+      { uci: 'c2c4', san: 'c4',  explanation: 'The Queen\'s Gambit! White attacks Black\'s d5 pawn. If taken, White gets a big center. If declined, White still has pressure.' },
+    ],
+    variations: [
+      {
+        name: 'Queen\'s Gambit Accepted',
+        moves: [
+          { uci: 'd5c4', san: 'dxc4', explanation: 'Black accepts the pawn! White gets a free center. Black tries to return the pawn later for active piece play.' },
+          { uci: 'e2e4', san: 'e4',   explanation: 'White immediately takes the full center.' },
+        ],
+        tip: 'Black should return the c4 pawn for activity — don\'t try to hold it with b5.',
+      },
+      {
+        name: 'Queen\'s Gambit Declined',
+        moves: [
+          { uci: 'e7e6', san: 'e6',  explanation: 'Black declines — the most solid response. The pawn chain holds d5 but restricts the c8 bishop.' },
+          { uci: 'b1c3', san: 'Nc3', explanation: 'White develops and plans e4.' },
+          { uci: 'g8f6', san: 'Nf6', explanation: 'Black develops the kingside knight.' },
+        ],
+        tip: 'After Bg5, the position becomes the classical QGD — one of the richest in chess.',
+      },
+      {
+        name: 'Slav Defense',
+        moves: [
+          { uci: 'c7c6', san: 'c6', explanation: 'The Slav! Black supports d5 with c6 instead of e6, keeping the c8 bishop free.' },
+        ],
+        tip: 'The Slav avoids the "bad bishop" problem of the QGD.',
+      },
+    ],
+    keyIdeas: [
+      'The "gambit" is not a real gambit — Black cannot hold the pawn',
+      'White aims for a free center with e4',
+      'Black fights for equality by activating pieces',
+      'The c1 and c8 bishops are the key pieces in the QGD',
+    ],
+    commonMistakes: [
+      'Trying to hold the c4 pawn with b5 — it weakens the queenside',
+      'Neglecting to develop the c8 bishop in the QGD',
+    ],
+    famousPlayers: ['Garry Kasparov', 'Anatoly Karpov', 'Magnus Carlsen'],
+    tags: ['classical', 'center', 'positional', 'solid'],
+  },
+
+  {
+    id: 'kings-indian',
+    eco: 'E60',
+    name: 'King\'s Indian Defense',
+    category: 'semi-closed',
+    difficulty: 'intermediate',
+    description: 'A hyper-dynamic defense! Black allows White to dominate the center, then attacks it with e5 and f5. The resulting positions are wildly unbalanced with attacks on opposite wings.',
+    moves: [
+      { uci: 'd2d4', san: 'd4',  explanation: 'White takes the center.' },
+      { uci: 'g8f6', san: 'Nf6', explanation: 'Black develops and fights for e4.' },
+      { uci: 'c2c4', san: 'c4',  explanation: 'White builds a huge center.' },
+      { uci: 'g7g6', san: 'g6',  explanation: 'Black fianchettoes — the King\'s Indian begins!' },
+      { uci: 'b1c3', san: 'Nc3', explanation: 'White develops.' },
+      { uci: 'f8g7', san: 'Bg7', explanation: 'The powerful dark-squared dragon bishop appears.' },
+      { uci: 'e2e4', san: 'e4',  explanation: 'White completes the massive pawn center.' },
+      { uci: 'd7d6', san: 'd6',  explanation: 'Black prepares the e5 counter-attack.' },
+      { uci: 'g1f3', san: 'Nf3', explanation: 'White develops the last minor piece.' },
+      { uci: 'e8g8', san: 'O-O', explanation: 'Black castles — now ready to play e5!' },
+    ],
+    keyIdeas: [
+      'Allow White\'s big center, then attack it with e5!',
+      'The g7 bishop is the star piece — protect it at all costs',
+      'Kingside attack with f5, g5, h5 — often a mating attack',
+      'Both sides race to attack on opposite wings',
+    ],
+    commonMistakes: [
+      'Being passive — the KID demands radical action!',
+      'Not playing e5 or c5 soon enough',
+      'Trading the g7 bishop without reason',
+    ],
+    famousPlayers: ['Bobby Fischer', 'Garry Kasparov', 'Teimour Radjabov'],
+    tags: ['dynamic', 'counter-attack', 'fianchetto', 'attacking'],
+  },
+
+  {
+    id: 'nimzo-indian',
+    eco: 'E20',
+    name: 'Nimzo-Indian Defense',
+    category: 'semi-closed',
+    difficulty: 'intermediate',
+    description: 'Invented by Aron Nimzowitsch, this defense immediately challenges White\'s control of e4 by pinning the c3 knight. One of the most strategically rich openings in chess.',
+    moves: [
+      { uci: 'd2d4', san: 'd4',  explanation: 'White takes the center.' },
+      { uci: 'g8f6', san: 'Nf6', explanation: 'Black develops.' },
+      { uci: 'c2c4', san: 'c4',  explanation: 'White expands.' },
+      { uci: 'e7e6', san: 'e6',  explanation: 'Solid pawn structure.' },
+      { uci: 'b1c3', san: 'Nc3', explanation: 'White develops the knight.' },
+      { uci: 'f8b4', san: 'Bb4', explanation: 'The Nimzo! Black immediately pins the c3 knight and threatens to double White\'s pawns.' },
+    ],
+    keyIdeas: [
+      'Pin the c3 knight to control e4',
+      'Force White to double pawns on c3 or play actively with e4 anyway',
+      'After Bxc3, Black gets the bishop pair compensation',
+      'Fight for d5 and e4 control throughout',
+    ],
+    commonMistakes: [
+      'Capturing on c3 too early without compensation',
+      'Not fighting for the e4 square after the pin',
+    ],
+    famousPlayers: ['Aron Nimzowitsch', 'Magnus Carlsen', 'Fabiano Caruana'],
+    tags: ['positional', 'pin', 'bishop-pair', 'strategic'],
+  },
+
+  {
+    id: 'queens-indian',
+    eco: 'E12',
+    name: 'Queen\'s Indian Defense',
+    category: 'semi-closed',
+    difficulty: 'intermediate',
+    description: 'When White avoids Nc3, Black fianchettoes on the queenside instead. The Queen\'s Indian is extremely solid and was Karpov\'s go-to weapon for decades.',
+    moves: [
+      { uci: 'd2d4', san: 'd4',  explanation: 'White takes the center.' },
+      { uci: 'g8f6', san: 'Nf6', explanation: 'Black develops.' },
+      { uci: 'c2c4', san: 'c4',  explanation: 'White expands.' },
+      { uci: 'e7e6', san: 'e6',  explanation: 'Solid pawn structure.' },
+      { uci: 'g1f3', san: 'Nf3', explanation: 'White develops — avoiding Nc3 which allows Nimzo-Indian.' },
+      { uci: 'b7b6', san: 'b6',  explanation: 'The Queen\'s Indian! Black prepares to fianchetto the queenside bishop.' },
+      { uci: 'g2g3', san: 'g3',  explanation: 'White fianchettoes on the kingside.' },
+      { uci: 'c8b7', san: 'Bb7', explanation: 'The b7 bishop controls the long diagonal and battles against the g2 bishop.' },
+    ],
+    keyIdeas: [
+      'The b7 and g2 bishops are the key pieces — they control opposite long diagonals',
+      'Fight for e4 control throughout the game',
+      'Very solid — Black aims for equality with precise play',
+      'Often transposes to other d4 systems',
+    ],
+    commonMistakes: [
+      'Playing Bb7 without knowing the follow-up plan',
+      'Being too passive on the queenside',
+    ],
+    famousPlayers: ['Anatoly Karpov', 'Vladimir Kramnik'],
+    tags: ['fianchetto', 'solid', 'positional', 'classical'],
+  },
+
+  {
+    id: 'grunfeld-defense',
+    eco: 'D70',
+    name: 'Grünfeld Defense',
+    category: 'semi-closed',
+    difficulty: 'advanced',
+    description: 'One of the most confrontational defenses against d4. Black allows a massive White center with e4 and d4, then immediately attacks it with c5 and d5 exchanges.',
+    moves: [
+      { uci: 'd2d4', san: 'd4',  explanation: 'White takes the center.' },
+      { uci: 'g8f6', san: 'Nf6', explanation: 'Black develops.' },
+      { uci: 'c2c4', san: 'c4',  explanation: 'White expands.' },
+      { uci: 'g7g6', san: 'g6',  explanation: 'Black prepares to fianchetto.' },
+      { uci: 'b1c3', san: 'Nc3', explanation: 'White develops.' },
+      { uci: 'd7d5', san: 'd5',  explanation: 'The Grünfeld! Black directly challenges the center — the most confrontational move.' },
+      { uci: 'c4d5', san: 'cxd5', explanation: 'White captures.' },
+      { uci: 'f6d5', san: 'Nxd5', explanation: 'Black recaptures.' },
+      { uci: 'e2e4', san: 'e4',  explanation: 'White pushes — now they have an enormous center!' },
+      { uci: 'd5c3', san: 'Nxc3', explanation: 'Black captures the knight, giving White doubled pawns but White gets the center.' },
+      { uci: 'b2c3', san: 'bxc3', explanation: 'White recaptures — 4 pawns in the center! But they can be attacked.' },
+      { uci: 'f8g7', san: 'Bg7', explanation: 'The dragon bishop immediately attacks the massive center.' },
+    ],
+    keyIdeas: [
+      'Destroy White\'s center with piece pressure and c5',
+      'The g7 bishop is essential — protect it!',
+      'Use the d5 square and c-file for piece activity',
+      'High-risk, high-reward — typical Grünfeld spirit',
+    ],
+    commonMistakes: [
+      'Forgetting to attack the White center — that\'s the whole point!',
+      'Trading the g7 bishop too quickly',
+    ],
+    famousPlayers: ['Garry Kasparov', 'Magnus Carlsen', 'Bobby Fischer'],
+    tags: ['hypermodern', 'dynamic', 'center-attack', 'advanced'],
+  },
+
+  {
+    id: 'dutch-defense',
+    eco: 'A80',
+    name: 'Dutch Defense',
+    category: 'semi-closed',
+    difficulty: 'intermediate',
+    description: 'An ambitious and somewhat risky defense. Black immediately plays f5 to prevent White from playing e4 and to control e4 for counterplay.',
+    moves: [
+      { uci: 'd2d4', san: 'd4',  explanation: 'White takes the center.' },
+      { uci: 'f7f5', san: 'f5',  explanation: 'The Dutch! Black immediately controls e4 but weakens the kingside.' },
+      { uci: 'g2g3', san: 'g3',  explanation: 'White fianchettoes to fight the f5 pawn influence.' },
+      { uci: 'e7e6', san: 'e6',  explanation: 'Black prepares Nf6 and Be7.' },
+      { uci: 'f1g2', san: 'Bg2', explanation: 'The fianchettoed bishop aims at Black\'s queenside.' },
+      { uci: 'g8f6', san: 'Nf6', explanation: 'Black develops the kingside.' },
+    ],
+    variations: [
+      {
+        name: 'Stonewall Dutch',
+        moves: [
+          { uci: 'd7d5', san: 'd5',  explanation: 'Black builds the Stonewall — a solid pawn triangle e6, f5, d5.' },
+          { uci: 'c7c6', san: 'c6',  explanation: 'Completing the stonewall formation.' },
+        ],
+        tip: 'The Stonewall is solid but the e5 square becomes permanently weak.',
+      },
+      {
+        name: 'Leningrad Dutch',
+        moves: [
+          { uci: 'g7g6', san: 'g6', explanation: 'Black fianchettoes too, aiming for dynamic play with the dragon bishop and f5.' },
+        ],
+        tip: 'The Leningrad is more aggressive — Black will push e5 after completing development.',
+      },
+    ],
+    keyIdeas: [
+      'Control e4 with f5 and pieces',
+      'Counter-attack with e5 in the Leningrad',
+      'The f5 pawn creates kingside attacking chances',
+      'White has a long-term advantage on e5 in most systems',
+    ],
+    commonMistakes: [
+      'Pushing too many pawns and creating weaknesses',
+      'Forgetting that the f5 pawn weakens the kingside',
+    ],
+    famousPlayers: ['Mikhail Botvinnik', 'Bent Larsen', 'Magnus Carlsen'],
+    tags: ['aggressive', 'counter-attack', 'e4-control', 'dynamic'],
+  },
+]
