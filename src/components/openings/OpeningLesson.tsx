@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Chessboard } from 'react-chessboard'
 import type { ChessOpening } from '../../types/openings'
 import type { UseLearnerResult } from '../../hooks/useOpeningLearner'
@@ -15,6 +16,19 @@ interface Props {
 
 export default function OpeningLesson({ opening, learner, boardSize = 360, onStartQuiz, onBack }: Props) {
   const { currentFen, currentMoveIdx, totalMoves, isComplete, nextMove, prevMove, jumpToMove } = learner
+
+  // Keyboard navigation in lesson mode
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.key === 'ArrowRight') nextMove()
+      if (e.key === 'ArrowLeft') prevMove()
+      if (e.key === 'ArrowUp') jumpToMove(-1)
+      if (e.key === 'ArrowDown') jumpToMove(totalMoves - 1)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [nextMove, prevMove, jumpToMove, totalMoves])
 
   const currentMove = opening.moves[currentMoveIdx]
   const nextMoveData = opening.moves[currentMoveIdx + 1]
