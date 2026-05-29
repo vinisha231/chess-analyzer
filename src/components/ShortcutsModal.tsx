@@ -3,11 +3,14 @@ interface Props {
 }
 
 const SHORTCUTS = [
-  { keys: ['←', '→'], description: 'Navigate moves backward / forward' },
-  { keys: ['↑'], description: 'Jump to the first move' },
-  { keys: ['↓'], description: 'Jump to the last move' },
-  { keys: ['F'], description: 'Flip the board' },
-  { keys: ['?'], description: 'Open this shortcuts dialog' },
+  { section: 'Main Board', keys: ['←', '→'], description: 'Navigate moves backward / forward' },
+  { section: null, keys: ['↑'], description: 'Jump to the first move' },
+  { section: null, keys: ['↓'], description: 'Jump to the last move' },
+  { section: null, keys: ['F'], description: 'Flip the board' },
+  { section: null, keys: ['?'], description: 'Open this shortcuts dialog' },
+  { section: 'Opening Lesson', keys: ['←', '→'], description: 'Step through opening moves' },
+  { section: null, keys: ['↑'], description: 'Go to start of opening' },
+  { section: null, keys: ['↓'], description: 'Go to end of opening' },
 ]
 
 export default function ShortcutsModal({ onClose }: Props) {
@@ -31,18 +34,23 @@ export default function ShortcutsModal({ onClose }: Props) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {SHORTCUTS.map(({ keys, description }) => (
-            <div key={description} className="flex items-center justify-between gap-4">
-              <span className="text-sm text-gray-300">{description}</span>
-              <div className="flex gap-1 shrink-0">
-                {keys.map(k => (
-                  <kbd
-                    key={k}
-                    className="px-2 py-0.5 bg-gray-700 border border-gray-600 rounded text-xs text-gray-200 font-mono"
-                  >
-                    {k}
-                  </kbd>
-                ))}
+          {SHORTCUTS.map(({ section, keys, description }) => (
+            <div key={`${section ?? ''}-${description}`}>
+              {section && (
+                <p className="text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-1.5">{section}</p>
+              )}
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm text-gray-300">{description}</span>
+                <div className="flex gap-1 shrink-0">
+                  {keys.map(k => (
+                    <kbd
+                      key={k}
+                      className="px-2 py-0.5 bg-gray-700 border border-gray-600 rounded text-xs text-gray-200 font-mono"
+                    >
+                      {k}
+                    </kbd>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
