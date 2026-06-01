@@ -17,12 +17,30 @@ export default function Toast({ message, onDone, duration = 1800 }: Props) {
 
   return (
     <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-      }`}
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+      style={{
+        transition: 'opacity 0.3s ease, transform 0.3s ease',
+        opacity: visible ? 1 : 0,
+        transform: `translateX(-50%) translateY(${visible ? '0' : '6px'})`,
+      }}
     >
-      <div className="bg-gray-700 border border-gray-600 text-white text-sm px-4 py-2 rounded-full shadow-xl flex items-center gap-2">
-        <span className="text-green-400">✓</span>
+      <div
+        className="flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-medium"
+        style={{
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-accent)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.10), var(--glow-indigo)',
+          color: 'var(--text-primary)',
+          backdropFilter: 'blur(12px)',
+        }}
+      >
+        <span
+          className="flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold"
+          style={{
+            background: 'rgba(99,102,241,0.20)',
+            color: 'var(--accent-indigo)',
+          }}
+        >✓</span>
         {message}
       </div>
     </div>
