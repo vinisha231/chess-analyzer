@@ -18,7 +18,6 @@ interface Props {
 export default function OpeningLesson({ opening, learner, boardSize = 360, onStartQuiz, onBack, onLoadIntoMainBoard }: Props) {
   const { currentFen, currentMoveIdx, totalMoves, isComplete, nextMove, prevMove, jumpToMove } = learner
 
-  // Keyboard navigation in lesson mode
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
@@ -34,22 +33,22 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
   const currentMove = opening.moves[currentMoveIdx]
   const nextMoveData = opening.moves[currentMoveIdx + 1]
 
-  // Highlight the last-played move
   const lastMoveSquares = () => {
     if (currentMoveIdx < 0 || !currentMove) return {}
     const uci = currentMove.uci
     return {
-      [uci.slice(0, 2)]: { backgroundColor: 'rgba(99,102,241,0.4)' },
-      [uci.slice(2, 4)]: { backgroundColor: 'rgba(99,102,241,0.6)' },
+      [uci.slice(0, 2)]: { backgroundColor: 'rgba(99,102,241,0.35)' },
+      [uci.slice(2, 4)]: { backgroundColor: 'rgba(99,102,241,0.55)' },
     }
   }
 
-  // Highlight next move as hint
   const hintArrow = nextMoveData ? [{
     startSquare: nextMoveData.uci.slice(0, 2),
     endSquare: nextMoveData.uci.slice(2, 4),
-    color: 'rgba(99,102,241,0.3)',
+    color: 'rgba(99,102,241,0.28)',
   }] : []
+
+  const progressPct = Math.round(((currentMoveIdx + 1) / totalMoves) * 100)
 
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
@@ -57,18 +56,29 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={onBack}
-          className="text-gray-500 hover:text-gray-300 transition-colors text-lg leading-none"
+          className="w-7 h-7 flex items-center justify-center rounded-lg transition-all text-lg leading-none"
+          style={{ color: 'var(--text-muted)' }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-overlay)'
+            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+          }}
           title="Back to catalog"
         >←</button>
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span>{CATEGORY_ICONS[opening.category]}</span>
-            <span className="text-xs font-mono text-gray-500">{opening.eco}</span>
+            <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>{opening.eco}</span>
             <DifficultyBadge difficulty={opening.difficulty} />
           </div>
-          <h2 className="text-sm font-bold text-white truncate">{opening.name}</h2>
+          <h2 className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{opening.name}</h2>
         </div>
-        <div className="flex gap-1 shrink-0">
+
+        <div className="flex gap-1.5 shrink-0">
           {onLoadIntoMainBoard && (
             <button
               onClick={() => {
@@ -79,14 +89,31 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
                 onLoadIntoMainBoard(pgn)
               }}
               title="Load into main board for analysis"
-              className="shrink-0 text-xs px-2 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-medium transition-colors"
+              className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-all"
+              style={{
+                background: 'var(--bg-overlay)',
+                border: '1px solid var(--border-muted)',
+                color: 'var(--text-secondary)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-accent)'
+                ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-muted)'
+                ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'
+              }}
             >
               ♟ Analyze
             </button>
           )}
           <button
             onClick={onStartQuiz}
-            className="shrink-0 text-xs px-2.5 py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors"
+            className="text-[11px] px-2.5 py-1.5 rounded-lg font-semibold transition-all text-white"
+            style={{
+              background: 'linear-gradient(135deg, var(--accent-purple), #7c3aed)',
+              boxShadow: '0 0 10px rgba(139,92,246,0.25)',
+            }}
           >
             🧠 Quiz
           </button>
@@ -105,16 +132,26 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
           }}
         />
 
-        {/* Progress bar below board */}
+        {/* Progress bar */}
         <div className="w-full">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          <div
+            className="flex items-center justify-between text-[10px] mb-1"
+            style={{ color: 'var(--text-muted)' }}
+          >
             <span>Move {Math.max(0, currentMoveIdx + 1)} of {totalMoves}</span>
-            <span>{Math.round(((currentMoveIdx + 1) / totalMoves) * 100)}%</span>
+            <span style={{ color: progressPct >= 100 ? '#4ade80' : 'var(--accent-indigo)' }}>
+              {progressPct}%
+            </span>
           </div>
-          <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-overlay)' }}>
             <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-300"
-              style={{ width: `${((currentMoveIdx + 1) / totalMoves) * 100}%` }}
+              className="h-full rounded-full transition-all duration-300"
+              style={{
+                width: `${progressPct}%`,
+                background: isComplete
+                  ? 'linear-gradient(90deg, #22c55e, #4ade80)'
+                  : 'linear-gradient(90deg, var(--accent-indigo), var(--accent-purple))',
+              }}
             />
           </div>
         </div>
@@ -124,21 +161,34 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
           <button
             onClick={prevMove}
             disabled={currentMoveIdx < 0}
-            className="flex-1 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-30 text-white rounded-lg text-xs font-medium transition-colors"
+            className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all disabled:opacity-30"
+            style={{
+              background: 'var(--bg-overlay)',
+              border: '1px solid var(--border-muted)',
+              color: 'var(--text-secondary)',
+            }}
           >
             ← Back
           </button>
           {!isComplete ? (
             <button
               onClick={nextMove}
-              className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors"
+              className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all text-white"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))',
+                boxShadow: '0 0 8px rgba(99,102,241,0.2)',
+              }}
             >
               Next →
             </button>
           ) : (
             <button
               onClick={onStartQuiz}
-              className="flex-1 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-xs font-medium transition-colors"
+              className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all text-white"
+              style={{
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                boxShadow: '0 0 8px rgba(34,197,94,0.25)',
+              }}
             >
               🎓 Take Quiz!
             </button>
@@ -148,49 +198,82 @@ export default function OpeningLesson({ opening, learner, boardSize = 360, onSta
 
       {/* Current move explanation */}
       {currentMoveIdx >= 0 && currentMove ? (
-        <div className="shrink-0 bg-gray-800/60 rounded-xl px-3 py-2.5 border border-gray-700">
+        <div
+          className="shrink-0 rounded-xl px-3 py-2.5"
+          style={{
+            background: 'rgba(99,102,241,0.06)',
+            border: '1px solid rgba(99,102,241,0.18)',
+          }}
+        >
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="font-mono text-base font-bold text-white">{currentMove.san}</span>
-            <span className="text-xs text-gray-500">move {currentMoveIdx + 1}</span>
+            <span className="font-mono text-base font-bold" style={{ color: 'var(--accent-indigo)' }}>
+              {currentMove.san}
+            </span>
+            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+              move {currentMoveIdx + 1}
+            </span>
           </div>
-          <p className="text-xs text-gray-300 leading-relaxed">{currentMove.explanation}</p>
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            {currentMove.explanation}
+          </p>
         </div>
       ) : (
-        <div className="shrink-0 bg-gray-800/60 rounded-xl px-3 py-2.5 border border-gray-700">
-          <p className="text-sm font-semibold text-white mb-1">{opening.name}</p>
-          <p className="text-xs text-gray-400 leading-relaxed">{opening.description}</p>
+        <div
+          className="shrink-0 rounded-xl px-3 py-2.5"
+          style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
+          <p className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+            {opening.name}
+          </p>
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            {opening.description}
+          </p>
         </div>
       )}
 
-      {/* Scrollable move list */}
+      {/* Scrollable move list + ideas */}
       <div className="flex-1 overflow-y-auto min-h-0">
         <OpeningMoveList
           opening={opening}
           currentMoveIdx={currentMoveIdx}
           onJump={jumpToMove}
         />
-        {/* Key ideas */}
+
         {opening.keyIdeas.length > 0 && (
-          <div className="mt-3 border-t border-gray-700 pt-3">
-            <p className="text-[10px] text-gray-600 uppercase tracking-wider font-semibold px-1 mb-2">Key Ideas</p>
-            <div className="flex flex-col gap-1">
+          <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+            <p
+              className="text-[9px] uppercase tracking-widest font-bold px-1 mb-2"
+              style={{ color: 'var(--accent-indigo)' }}
+            >
+              Key Ideas
+            </p>
+            <div className="flex flex-col gap-1.5">
               {opening.keyIdeas.map((idea, i) => (
-                <div key={i} className="flex items-start gap-1.5 text-xs text-gray-400">
-                  <span className="text-blue-400 shrink-0 mt-0.5">›</span>
-                  <span>{idea}</span>
+                <div key={i} className="flex items-start gap-1.5 text-xs">
+                  <span style={{ color: 'var(--accent-indigo)' }} className="shrink-0 mt-0.5">›</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>{idea}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
+
         {opening.commonMistakes && opening.commonMistakes.length > 0 && (
-          <div className="mt-3 border-t border-gray-700 pt-3">
-            <p className="text-[10px] text-gray-600 uppercase tracking-wider font-semibold px-1 mb-2">Common Mistakes</p>
-            <div className="flex flex-col gap-1">
+          <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+            <p
+              className="text-[9px] uppercase tracking-widest font-bold px-1 mb-2"
+              style={{ color: '#f87171' }}
+            >
+              Common Mistakes
+            </p>
+            <div className="flex flex-col gap-1.5">
               {opening.commonMistakes.map((mistake, i) => (
-                <div key={i} className="flex items-start gap-1.5 text-xs text-gray-400">
-                  <span className="text-red-400 shrink-0 mt-0.5">⚠</span>
-                  <span>{mistake}</span>
+                <div key={i} className="flex items-start gap-1.5 text-xs">
+                  <span style={{ color: '#f87171' }} className="shrink-0 mt-0.5">⚠</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>{mistake}</span>
                 </div>
               ))}
             </div>
