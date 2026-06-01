@@ -59,7 +59,6 @@ export default function OpeningsPanel({ boardSize = 320, onLoadPGN }: Props) {
     setActiveOpening(null)
   }, [learner])
 
-  // Show lesson/quiz view
   if (view === 'lesson' && activeOpening) {
     return (
       <OpeningLesson
@@ -85,23 +84,35 @@ export default function OpeningsPanel({ boardSize = 320, onLoadPGN }: Props) {
     )
   }
 
-  // Catalog/Stats tabs
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
       {/* Tab bar */}
-      <div className="flex gap-1 bg-gray-900/60 rounded-lg p-1 shrink-0">
-        <button
-          onClick={() => setActiveTab('catalog')}
-          className={`flex-1 py-1 rounded-md text-xs font-medium transition-colors ${activeTab === 'catalog' ? 'bg-gray-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          📚 Openings
-        </button>
-        <button
-          onClick={() => setActiveTab('stats')}
-          className={`flex-1 py-1 rounded-md text-xs font-medium transition-colors ${activeTab === 'stats' ? 'bg-gray-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          📊 My Progress
-        </button>
+      <div
+        className="flex gap-1 p-1 rounded-xl shrink-0"
+        style={{
+          background: 'var(--bg-overlay)',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        {([
+          { id: 'catalog', label: '📚 Openings' },
+          { id: 'stats',   label: '📊 My Progress' },
+        ] as const).map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={activeTab === tab.id ? {
+              background: 'var(--accent-indigo)',
+              color: '#fff',
+              boxShadow: '0 0 10px rgba(99,102,241,0.3)',
+            } : {
+              color: 'var(--text-muted)',
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {activeTab === 'catalog' && (
