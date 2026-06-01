@@ -11,10 +11,10 @@ const TIME_CLASS_ICON: Record<string, string> = {
   bullet: '⚡', blitz: '🔥', rapid: '⏱', daily: '📅',
 }
 
-const RESULT_STYLE = {
-  win:  'text-green-400 bg-green-900/30 border-green-800/50',
-  loss: 'text-red-400 bg-red-900/30 border-red-800/50',
-  draw: 'text-gray-400 bg-gray-700/30 border-gray-700',
+const RESULT_STYLE: Record<string, { color: string; bg: string; border: string; bar: string }> = {
+  win:  { color: '#4ade80', bg: 'rgba(34,197,94,0.10)', border: 'rgba(34,197,94,0.25)', bar: '#4ade80' },
+  loss: { color: '#f87171', bg: 'rgba(239,68,68,0.10)', border: 'rgba(239,68,68,0.25)', bar: '#f87171' },
+  draw: { color: 'var(--text-secondary)', bg: 'var(--bg-overlay)', border: 'var(--border-muted)', bar: 'var(--text-muted)' },
 }
 
 const RESULT_LABEL = { win: 'Won', loss: 'Lost', draw: 'Draw' }
@@ -30,58 +30,92 @@ export default function GameImportCard({ game, username, onImport }: Props) {
   const accuracy = game.accuracies
     ? (isWhite ? game.accuracies.white : game.accuracies.black)
     : null
+  const rs = RESULT_STYLE[result]
 
   return (
-    <div className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-700/50 transition-colors group">
-      <div className={`w-1 self-stretch rounded-full shrink-0 ${
-        result === 'win' ? 'bg-green-500' : result === 'loss' ? 'bg-red-500' : 'bg-gray-600'
-      }`} />
+    <div
+      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all group cursor-default"
+      style={{
+        background: 'var(--bg-elevated)',
+        border: '1px solid var(--border-subtle)',
+      }}
+      onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-muted)'}
+      onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-subtle)'}
+    >
+      {/* Result bar */}
+      <div
+        className="w-1 self-stretch rounded-full shrink-0"
+        style={{ background: rs.bar, minHeight: '36px' }}
+      />
 
+      {/* Game info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-xs" title={game.time_class}>{TIME_CLASS_ICON[game.time_class] ?? '♟'}</span>
-          <span className="text-xs font-mono text-gray-400">{formatTimeControl(game.time_control)}</span>
-          <span className="text-gray-600">·</span>
-          <span className="text-xs text-gray-500">{dateStr}</span>
+          <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+            {formatTimeControl(game.time_control)}
+          </span>
+          <span style={{ color: 'var(--border-muted)' }}>·</span>
+          <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{dateStr}</span>
           {accuracy !== null && (
             <>
-              <span className="text-gray-600">·</span>
-              <span className={`text-xs font-mono ${accuracy >= 85 ? 'text-green-400' : accuracy >= 70 ? 'text-yellow-400' : 'text-red-400'}`}>
+              <span style={{ color: 'var(--border-muted)' }}>·</span>
+              <span
+                className="text-[10px] font-mono font-bold"
+                style={{
+                  color: accuracy >= 85 ? '#4ade80' : accuracy >= 70 ? '#fbbf24' : '#f87171',
+                }}
+              >
                 {accuracy.toFixed(0)}%
               </span>
             </>
           )}
         </div>
         <div className="flex items-center gap-1 text-xs">
-          <span className={`font-medium ${result === 'win' ? 'text-white' : 'text-gray-400'}`}>
+          <span className="font-semibold" style={{ color: result === 'win' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
             {isWhite ? '♙' : '♟'} {me.rating}
           </span>
-          <span className="text-gray-600">vs</span>
-          <span className="text-gray-300 truncate">{opp.username}</span>
-          <span className="text-gray-500 shrink-0">{opp.rating}</span>
+          <span style={{ color: 'var(--text-muted)' }}>vs</span>
+          <span className="truncate" style={{ color: 'var(--text-secondary)' }}>{opp.username}</span>
+          <span className="shrink-0" style={{ color: 'var(--text-muted)' }}>{opp.rating}</span>
         </div>
         {opening && (
-          <p className="text-xs text-gray-600 truncate mt-0.5">{opening}</p>
+          <p className="text-[10px] truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{opening}</p>
         )}
       </div>
 
+      {/* Actions */}
       <div className="flex items-center gap-1.5 shrink-0">
-        <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${RESULT_STYLE[result]}`}>
+        <span
+          className="text-[10px] px-2 py-0.5 rounded-md font-bold"
+          style={{
+            color: rs.color,
+            background: rs.bg,
+            border: `1px solid ${rs.border}`,
+          }}
+        >
           {RESULT_LABEL[result]}
         </span>
         <a
           href={game.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100 text-base leading-none"
+          className="text-sm leading-none transition-all opacity-0 group-hover:opacity-100"
+          style={{ color: 'var(--text-muted)' }}
           title="Open on chess.com"
           onClick={e => e.stopPropagation()}
-        >
-          ↗
-        </a>
+          onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)'}
+          onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-muted)'}
+        >↗</a>
         <button
           onClick={() => onImport(game.pgn)}
-          className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors font-medium"
+          className="text-[11px] px-2.5 py-1 rounded-lg font-semibold transition-all"
+          style={{
+            background: 'var(--accent-indigo)',
+            color: '#fff',
+          }}
+          onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 10px rgba(99,102,241,0.4)'}
+          onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none'}
         >
           Analyze
         </button>
