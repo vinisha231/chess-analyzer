@@ -54,10 +54,15 @@ export function useChessCom() {
       }))
       return true
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Unknown error'
-      const friendly = msg.includes('404')
-        ? `Player "${username}" not found on chess.com`
-        : 'Could not connect to chess.com. Check your username and try again.'
+      const msg = e instanceof Error ? e.message : 'UNKNOWN'
+      const friendly =
+        msg === 'NOT_FOUND'
+          ? `"${username}" wasn't found on chess.com. Make sure you're using your username (visible in your profile URL: chess.com/member/username), not your display name.`
+          : msg === 'RATE_LIMITED'
+          ? 'chess.com is rate-limiting requests — wait a few seconds and try again.'
+          : msg === 'NETWORK'
+          ? 'Network error — could not reach chess.com. Check your internet connection.'
+          : `chess.com returned an unexpected error. Try again in a moment.`
       setState(prev => ({ ...prev, connectionState: 'error', error: friendly }))
       return false
     }

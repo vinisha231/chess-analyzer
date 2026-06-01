@@ -1,5 +1,4 @@
 const BASE = 'https://api.chess.com/pub'
-const HEADERS = { 'User-Agent': 'chess-analyzer-app' }
 
 export interface ChessComProfile {
   username: string
@@ -45,8 +44,18 @@ export interface ChessComGame {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { headers: HEADERS })
-  if (!res.ok) throw new Error(`chess.com API ${res.status}: ${path}`)
+  let res: Response
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      mode: 'cors',
+      headers: { Accept: 'application/json' },
+    })
+  } catch {
+    throw new Error('NETWORK')
+  }
+  if (res.status === 404) throw new Error('NOT_FOUND')
+  if (res.status === 429) throw new Error('RATE_LIMITED')
+  if (!res.ok) throw new Error(`HTTP_${res.status}`)
   return res.json() as Promise<T>
 }
 

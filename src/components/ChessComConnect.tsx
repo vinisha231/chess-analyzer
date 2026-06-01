@@ -127,7 +127,12 @@ export default function ChessComConnect({ connectionState, profile, stats, error
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-        Enter your chess.com username to load your games. No login required — uses the public API.
+        Enter your chess.com{' '}
+        <strong style={{ color: 'var(--text-primary)' }}>username</strong>
+        {' '}— the one in your profile URL:{' '}
+        <span className="font-mono text-[10px]" style={{ color: 'var(--accent-indigo)' }}>
+          chess.com/member/<em>username</em>
+        </span>
       </p>
       <div className="flex gap-2">
         <input
@@ -137,7 +142,7 @@ export default function ChessComConnect({ connectionState, profile, stats, error
             border: '1px solid var(--border-muted)',
             color: 'var(--text-primary)',
           }}
-          placeholder="chess.com username"
+          placeholder="e.g. hikaru"
           value={username}
           onChange={e => setUsername(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && username.trim() && onConnect(username.trim())}
@@ -159,16 +164,25 @@ export default function ChessComConnect({ connectionState, profile, stats, error
         </button>
       </div>
       {error && (
-        <p
-          className="text-xs px-3 py-2 rounded-lg"
+        <div
+          className="text-xs px-3 py-2.5 rounded-lg leading-relaxed"
           style={{
             color: '#fca5a5',
             background: 'rgba(239,68,68,0.08)',
             border: '1px solid rgba(239,68,68,0.2)',
           }}
         >
-          {error}
-        </p>
+          <p>{error}</p>
+          <a
+            href="https://www.chess.com/member"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 inline-block underline text-[10px]"
+            style={{ color: 'var(--accent-indigo)' }}
+          >
+            Find your chess.com username ↗
+          </a>
+        </div>
       )}
     </div>
   )
