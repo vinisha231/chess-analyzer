@@ -8,6 +8,12 @@ interface Props {
   onClose: () => void
 }
 
+const TABS = [
+  { id: 'export', label: 'Export PGN' },
+  { id: 'pgn',    label: 'Import PGN' },
+  { id: 'fen',    label: 'Import FEN' },
+] as const
+
 export default function PGNPanel({ pgn, onImportPGN, onImportFEN, onClose }: Props) {
   const [tab, setTab] = useState<'export' | 'pgn' | 'fen'>('export')
   const [importText, setImportText] = useState('')
@@ -25,86 +31,178 @@ export default function PGNPanel({ pgn, onImportPGN, onImportFEN, onClose }: Pro
   const handleImport = () => {
     setError('')
     setSuccess('')
-    let ok = false
     if (tab === 'pgn') {
-      ok = onImportPGN(importText.trim())
+      const ok = onImportPGN(importText.trim())
       if (!ok) setError('Invalid PGN format')
       else { setSuccess('Game loaded!'); setImportText('') }
     } else if (tab === 'fen') {
       if (!parseFEN(importText.trim())) { setError('Invalid FEN string'); return }
-      ok = onImportFEN(importText.trim())
+      const ok = onImportFEN(importText.trim())
       if (!ok) setError('Invalid FEN position')
       else { setSuccess('Position loaded!'); setImportText('') }
     }
   }
 
+  const textareaStyle: React.CSSProperties = {
+    background: 'var(--bg-base)',
+    border: '1px solid var(--border-muted)',
+    color: 'var(--text-secondary)',
+    borderRadius: '12px',
+    padding: '12px',
+    resize: 'none',
+    outline: 'none',
+    width: '100%',
+    fontFamily: 'monospace',
+    fontSize: '11px',
+    lineHeight: 1.6,
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-gray-800 rounded-2xl p-6 shadow-2xl w-full max-w-md mx-4 border border-gray-700">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-white">PGN / FEN</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none">×</button>
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)' }}
+    >
+      <div
+        className="rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-fade-up"
+        style={{
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-accent)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6), var(--glow-indigo)',
+        }}
+      >
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: '1px solid var(--border-subtle)' }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold"
+              style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.25)', color: 'var(--accent-indigo)' }}
+            >PGN</div>
+            <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>PGN / FEN</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-lg leading-none transition-all"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-overlay)'
+              ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+              ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+            }}
+          >×</button>
         </div>
 
-        <div className="flex gap-1 mb-4 bg-gray-900 rounded-lg p-1">
-          {(['export', 'pgn', 'fen'] as const).map(t => (
+        {/* Tab bar */}
+        <div
+          className="flex gap-1 p-1.5 mx-5 mt-4 mb-3 rounded-xl"
+          style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border-subtle)' }}
+        >
+          {TABS.map(t => (
             <button
-              key={t}
-              onClick={() => { setTab(t); setError(''); setSuccess('') }}
-              className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${
-                tab === t ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
-              }`}
+              key={t.id}
+              onClick={() => { setTab(t.id); setError(''); setSuccess('') }}
+              className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={tab === t.id ? {
+                background: 'var(--accent-indigo)',
+                color: '#fff',
+                boxShadow: '0 0 10px rgba(99,102,241,0.3)',
+              } : {
+                color: 'var(--text-muted)',
+              }}
             >
-              {t === 'export' ? 'Export PGN' : t === 'pgn' ? 'Import PGN' : 'Import FEN'}
+              {t.label}
             </button>
           ))}
         </div>
 
-        {tab === 'export' && (
-          <div>
-            <textarea
-              readOnly
-              value={pgn || '(no moves yet)'}
-              className="w-full h-40 bg-gray-900 text-gray-300 text-xs font-mono p-3 rounded-lg resize-none border border-gray-700 focus:outline-none"
-            />
-            <div className="flex gap-2 mt-3">
+        {/* Content */}
+        <div className="px-5 pb-5">
+          {tab === 'export' && (
+            <div className="flex flex-col gap-3">
+              <textarea
+                readOnly
+                value={pgn || '(no moves yet)'}
+                rows={8}
+                style={textareaStyle}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCopy}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  style={copied ? {
+                    background: 'rgba(34,197,94,0.15)',
+                    border: '1px solid rgba(34,197,94,0.3)',
+                    color: '#4ade80',
+                  } : {
+                    background: 'var(--bg-overlay)',
+                    border: '1px solid var(--border-muted)',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  {copied ? '✓ Copied!' : 'Copy'}
+                </button>
+                <button
+                  onClick={() => downloadPGN(pgn, `game-${Date.now()}.pgn`)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))',
+                    color: '#fff',
+                    boxShadow: 'var(--glow-indigo)',
+                  }}
+                >
+                  Download
+                </button>
+              </div>
+            </div>
+          )}
+
+          {(tab === 'pgn' || tab === 'fen') && (
+            <div className="flex flex-col gap-3">
+              <textarea
+                value={importText}
+                onChange={e => setImportText(e.target.value)}
+                placeholder={tab === 'pgn' ? 'Paste PGN here…' : 'Paste FEN string here…'}
+                rows={6}
+                style={textareaStyle}
+                onFocus={e => (e.currentTarget as HTMLTextAreaElement).style.borderColor = 'var(--border-accent)'}
+                onBlur={e => (e.currentTarget as HTMLTextAreaElement).style.borderColor = 'var(--border-muted)'}
+              />
+              {error && (
+                <p
+                  className="text-xs px-3 py-2 rounded-lg"
+                  style={{ color: '#fca5a5', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}
+                >
+                  {error}
+                </p>
+              )}
+              {success && (
+                <p
+                  className="text-xs px-3 py-2 rounded-lg"
+                  style={{ color: '#4ade80', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+                >
+                  {success}
+                </p>
+              )}
               <button
-                onClick={handleCopy}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  copied ? 'bg-green-700 text-green-200' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-                }`}
+                onClick={handleImport}
+                disabled={!importText.trim()}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
+                style={{
+                  background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))',
+                  color: '#fff',
+                  boxShadow: 'var(--glow-indigo)',
+                }}
               >
-                {copied ? '✓ Copied!' : 'Copy'}
-              </button>
-              <button
-                onClick={() => downloadPGN(pgn, `game-${Date.now()}.pgn`)}
-                className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                Download
+                Load
               </button>
             </div>
-          </div>
-        )}
-
-        {(tab === 'pgn' || tab === 'fen') && (
-          <div>
-            <textarea
-              value={importText}
-              onChange={e => setImportText(e.target.value)}
-              placeholder={tab === 'pgn' ? 'Paste PGN here…' : 'Paste FEN string here…'}
-              className="w-full h-32 bg-gray-900 text-gray-300 text-xs font-mono p-3 rounded-lg resize-none border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-            {success && <p className="text-green-400 text-xs mt-1">{success}</p>}
-            <button
-              onClick={handleImport}
-              disabled={!importText.trim()}
-              className="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              Load
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
