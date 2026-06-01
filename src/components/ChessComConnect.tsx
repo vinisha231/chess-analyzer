@@ -19,17 +19,27 @@ function RatingPill({ label, rating, record }: {
   if (!rating) return null
   const total = (record?.win ?? 0) + (record?.loss ?? 0) + (record?.draw ?? 0)
   return (
-    <div className="flex flex-col items-center bg-gray-700/60 rounded-lg px-3 py-2 min-w-0">
-      <span className="text-xs text-gray-400 mb-0.5">{label}</span>
-      <span className="text-lg font-bold text-white leading-none">{rating}</span>
+    <div
+      className="flex flex-col items-center rounded-xl px-3 py-2 min-w-0 flex-1"
+      style={{
+        background: 'var(--bg-overlay)',
+        border: '1px solid var(--border-muted)',
+      }}
+    >
+      <span className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: 'var(--text-muted)' }}>
+        {label}
+      </span>
+      <span className="text-lg font-bold leading-none" style={{ color: 'var(--text-primary)' }}>
+        {rating}
+      </span>
       {record && total > 0 && (
-        <span className="text-xs text-gray-500 mt-0.5">
-          <span className="text-green-400">{record.win}W</span>
-          {' / '}
-          <span className="text-red-400">{record.loss}L</span>
-          {' / '}
-          <span className="text-gray-400">{record.draw}D</span>
-        </span>
+        <div className="flex gap-1 mt-1 text-[10px] font-mono">
+          <span style={{ color: '#4ade80' }}>{record.win}W</span>
+          <span style={{ color: 'var(--text-muted)' }}>/</span>
+          <span style={{ color: '#f87171' }}>{record.loss}L</span>
+          <span style={{ color: 'var(--text-muted)' }}>/</span>
+          <span style={{ color: 'var(--text-secondary)' }}>{record.draw}D</span>
+        </div>
       )}
     </div>
   )
@@ -41,40 +51,74 @@ export default function ChessComConnect({ connectionState, profile, stats, error
   if (connectionState === 'connected' && profile) {
     return (
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3">
+        {/* Profile row */}
+        <div
+          className="flex items-center gap-3 rounded-xl p-3"
+          style={{
+            background: 'var(--bg-overlay)',
+            border: '1px solid var(--border-muted)',
+          }}
+        >
           {profile.avatar && (
-            <img src={profile.avatar} alt={profile.username} className="w-12 h-12 rounded-full border-2 border-gray-600" />
+            <img
+              src={profile.avatar}
+              alt={profile.username}
+              className="w-11 h-11 rounded-full shrink-0"
+              style={{ border: '2px solid var(--border-accent)' }}
+            />
           )}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 mb-0.5">
               {profile.title && (
-                <span className="text-xs bg-yellow-600 text-black font-bold px-1.5 py-0.5 rounded">{profile.title}</span>
+                <span
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                  style={{ background: 'var(--accent-gold)', color: '#000' }}
+                >
+                  {profile.title}
+                </span>
               )}
               <a
                 href={profile.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-white font-bold hover:text-blue-400 transition-colors truncate"
+                className="font-bold text-sm transition-colors truncate"
+                style={{ color: 'var(--text-primary)' }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-indigo)'}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)'}
               >
                 {profile.username}
               </a>
             </div>
-            {profile.name && <p className="text-xs text-gray-400 truncate">{profile.name}</p>}
-            <p className="text-xs text-gray-500">{profile.followers.toLocaleString()} followers</p>
+            {profile.name && (
+              <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{profile.name}</p>
+            )}
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+              {profile.followers.toLocaleString()} followers
+            </p>
           </div>
           <button
             onClick={onDisconnect}
-            className="text-xs text-gray-500 hover:text-red-400 transition-colors shrink-0"
+            className="text-xs shrink-0 px-2 py-1 rounded-lg transition-all"
+            style={{ color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.color = '#f87171'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(248,113,113,0.3)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-subtle)'
+            }}
           >
             Disconnect
           </button>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
-          <RatingPill label="Rapid" rating={stats?.chess_rapid?.last.rating} record={stats?.chess_rapid?.record} />
-          <RatingPill label="Blitz" rating={stats?.chess_blitz?.last.rating} record={stats?.chess_blitz?.record} />
+        {/* Rating pills */}
+        <div className="flex gap-2">
+          <RatingPill label="Rapid"  rating={stats?.chess_rapid?.last.rating}  record={stats?.chess_rapid?.record} />
+          <RatingPill label="Blitz"  rating={stats?.chess_blitz?.last.rating}  record={stats?.chess_blitz?.record} />
           <RatingPill label="Bullet" rating={stats?.chess_bullet?.last.rating} record={stats?.chess_bullet?.record} />
-          <RatingPill label="Daily" rating={stats?.chess_daily?.last.rating} record={stats?.chess_daily?.record} />
+          <RatingPill label="Daily"  rating={stats?.chess_daily?.last.rating}  record={stats?.chess_daily?.record} />
         </div>
       </div>
     )
@@ -82,27 +126,50 @@ export default function ChessComConnect({ connectionState, profile, stats, error
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs text-gray-400">
+      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
         Enter your chess.com username to load your games. No login required — uses the public API.
       </p>
       <div className="flex gap-2">
         <input
-          className="flex-1 bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500 text-sm placeholder-gray-600"
+          className="flex-1 px-3 py-2 rounded-xl text-sm outline-none transition-all"
+          style={{
+            background: 'var(--bg-overlay)',
+            border: '1px solid var(--border-muted)',
+            color: 'var(--text-primary)',
+          }}
           placeholder="chess.com username"
           value={username}
           onChange={e => setUsername(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && username.trim() && onConnect(username.trim())}
           disabled={connectionState === 'loading'}
+          onFocus={e => (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-accent)'}
+          onBlur={e => (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-muted)'}
         />
         <button
           onClick={() => username.trim() && onConnect(username.trim())}
           disabled={!username.trim() || connectionState === 'loading'}
-          className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors shrink-0"
+          className="px-4 py-2 rounded-xl text-sm font-semibold transition-all shrink-0 disabled:opacity-40"
+          style={{
+            background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+            color: '#fff',
+            boxShadow: '0 0 12px rgba(34,197,94,0.25)',
+          }}
         >
           {connectionState === 'loading' ? '…' : 'Connect'}
         </button>
       </div>
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && (
+        <p
+          className="text-xs px-3 py-2 rounded-lg"
+          style={{
+            color: '#fca5a5',
+            background: 'rgba(239,68,68,0.08)',
+            border: '1px solid rgba(239,68,68,0.2)',
+          }}
+        >
+          {error}
+        </p>
+      )}
     </div>
   )
 }
