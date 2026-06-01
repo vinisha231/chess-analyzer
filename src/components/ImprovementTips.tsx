@@ -24,14 +24,12 @@ function analyzeGames(games: ChessComGame[], username: string): Tip[] {
   const total = games.length
   const winRate = wins / total
 
-  // Win rate
   if (winRate >= 0.6) {
     tips.push({ icon: '🏆', title: 'Great win rate', detail: `${Math.round(winRate * 100)}% wins in the last ${total} games.`, severity: 'good' })
   } else if (winRate < 0.35) {
     tips.push({ icon: '📉', title: 'Win rate needs work', detail: `Only ${Math.round(winRate * 100)}% of ${total} games. Focus on openings and avoiding blunders.`, severity: 'warn' })
   }
 
-  // Accuracy
   const gamesWithAccuracy = games.filter(g => g.accuracies)
   if (gamesWithAccuracy.length >= 3) {
     const accs = gamesWithAccuracy.map(g => {
@@ -48,14 +46,12 @@ function analyzeGames(games: ChessComGame[], username: string): Tip[] {
     }
   }
 
-  // Time controls played
   const timeClasses = games.map(g => g.time_class)
   const mostPlayed = ['bullet','blitz','rapid','daily'].find(tc => timeClasses.filter(t => t === tc).length > total * 0.4)
   if (mostPlayed === 'bullet') {
     tips.push({ icon: '⚡', title: 'Mostly bullet games', detail: 'Bullet is fun but hides mistakes. Try more rapid games to build deeper understanding.', severity: 'info' })
   }
 
-  // Color performance
   const whiteGames = games.filter(g => g.white.username.toLowerCase() === lc)
   const blackGames = games.filter(g => g.black.username.toLowerCase() === lc)
   if (whiteGames.length >= 5 && blackGames.length >= 5) {
@@ -69,7 +65,6 @@ function analyzeGames(games: ChessComGame[], username: string): Tip[] {
     }
   }
 
-  // Draw rate
   const drawRate = draws / total
   if (drawRate > 0.25) {
     tips.push({ icon: '🤝', title: 'High draw rate', detail: `${Math.round(drawRate * 100)}% draws — you may be playing too defensively. Look for winning chances.`, severity: 'info' })
@@ -80,31 +75,73 @@ function analyzeGames(games: ChessComGame[], username: string): Tip[] {
   return tips
 }
 
-const SEVERITY_STYLE = {
-  good: 'border-green-800/40 bg-green-900/10',
-  warn: 'border-yellow-800/40 bg-yellow-900/10',
-  info: 'border-gray-700/40 bg-gray-800/20',
+const SEVERITY: Record<string, { bg: string; border: string; iconBg: string }> = {
+  good: {
+    bg: 'rgba(34,197,94,0.05)',
+    border: 'rgba(34,197,94,0.20)',
+    iconBg: 'rgba(34,197,94,0.12)',
+  },
+  warn: {
+    bg: 'rgba(245,158,11,0.05)',
+    border: 'rgba(245,158,11,0.20)',
+    iconBg: 'rgba(245,158,11,0.12)',
+  },
+  info: {
+    bg: 'var(--bg-elevated)',
+    border: 'var(--border-subtle)',
+    iconBg: 'var(--bg-overlay)',
+  },
 }
 
 export default function ImprovementTips({ games, username }: Props) {
   const tips = analyzeGames(games, username)
 
   if (games.length === 0) {
-    return <p className="text-gray-500 text-xs text-center py-3">Load games to see improvement tips</p>
+    return (
+      <div className="flex flex-col items-center py-6 gap-2">
+        <span className="text-2xl opacity-20">💡</span>
+        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+          Load games to see improvement tips
+        </p>
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs text-gray-500">Based on {games.length} games</p>
-      {tips.map((tip, i) => (
-        <div key={i} className={`rounded-lg border px-3 py-2 ${SEVERITY_STYLE[tip.severity]}`}>
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-sm">{tip.icon}</span>
-            <span className="text-xs font-semibold text-gray-200">{tip.title}</span>
+      <p className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>
+        Based on {games.length} recent games
+      </p>
+      {tips.map((tip, i) => {
+        const s = SEVERITY[tip.severity]
+        return (
+          <div
+            key={i}
+            className="rounded-xl px-3 py-2.5 transition-all"
+            style={{
+              background: s.bg,
+              border: `1px solid ${s.border}`,
+            }}
+          >
+            <div className="flex items-start gap-2.5">
+              <div
+                className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+                style={{ background: s.iconBg }}
+              >
+                {tip.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>
+                  {tip.title}
+                </p>
+                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  {tip.detail}
+                </p>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed">{tip.detail}</p>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
