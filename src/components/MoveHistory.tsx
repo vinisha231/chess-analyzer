@@ -12,10 +12,10 @@ function countClassification(moves: MoveRecord[], label: string) {
 }
 
 const QUALITY_SUMMARY = [
-  { label: 'brilliant', emoji: '✨', color: 'text-cyan-400', title: 'Brilliant' },
-  { label: 'blunder',   emoji: '??', color: 'text-red-400',  title: 'Blunders' },
-  { label: 'mistake',   emoji: '?',  color: 'text-orange-400', title: 'Mistakes' },
-  { label: 'inaccuracy',emoji: '?!', color: 'text-yellow-400', title: 'Inaccuracies' },
+  { label: 'brilliant', emoji: '✨', colorVar: '#22d3ee', title: 'Brilliant' },
+  { label: 'blunder',   emoji: '??', colorVar: '#f87171', title: 'Blunders' },
+  { label: 'mistake',   emoji: '?',  colorVar: '#fb923c', title: 'Mistakes' },
+  { label: 'inaccuracy',emoji: '?!', colorVar: '#fbbf24', title: 'Inaccuracies' },
 ]
 
 const BAD_LABELS = new Set(['blunder', 'mistake', 'inaccuracy'])
@@ -30,24 +30,31 @@ function BlunderNav({ moves, currentIndex, onJump }: Props) {
   const prevBad = [...badIndices].reverse().find(i => i < currentIndex)
   const nextBad = badIndices.find(i => i > currentIndex)
 
+  const btnBase: React.CSSProperties = {
+    background: 'var(--bg-overlay)',
+    border: '1px solid var(--border-muted)',
+    color: 'var(--text-secondary)',
+    borderRadius: '6px',
+    fontSize: '10px',
+    padding: '2px 8px',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+  }
+
   return (
     <div className="ml-auto flex items-center gap-1">
       <button
         onClick={() => prevBad !== undefined && onJump(prevBad)}
         disabled={prevBad === undefined}
-        title="Previous mistake/blunder"
-        className="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-default transition-colors"
-      >
-        ‹ mistake
-      </button>
+        style={{ ...btnBase, opacity: prevBad === undefined ? 0.3 : 1 }}
+        title="Previous mistake"
+      >‹ blunder</button>
       <button
         onClick={() => nextBad !== undefined && onJump(nextBad)}
         disabled={nextBad === undefined}
-        title="Next mistake/blunder"
-        className="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-default transition-colors"
-      >
-        mistake ›
-      </button>
+        style={{ ...btnBase, opacity: nextBad === undefined ? 0.3 : 1 }}
+        title="Next mistake"
+      >blunder ›</button>
     </div>
   )
 }
@@ -68,73 +75,128 @@ export default function MoveHistory({ moves, currentIndex, onJump }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 py-1.5 border-b border-gray-700">
-        Move History
+      {/* Header */}
+      <div
+        className="flex items-center gap-2 px-3 py-2 shrink-0"
+        style={{
+          borderBottom: '1px solid var(--border-subtle)',
+        }}
+      >
+        <span
+          className="text-[10px] font-bold uppercase tracking-widest"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Move History
+        </span>
+
+        {hasClassifications && (
+          <div className="flex items-center gap-2 ml-1">
+            {QUALITY_SUMMARY.map(({ label, emoji, colorVar, title }) => {
+              const count = countClassification(moves, label)
+              if (count === 0) return null
+              return (
+                <span
+                  key={label}
+                  className="flex items-center gap-0.5 text-xs font-bold font-mono"
+                  style={{ color: colorVar }}
+                  title={title}
+                >
+                  <span>{emoji}</span>
+                  <span>{count}</span>
+                </span>
+              )
+            })}
+          </div>
+        )}
+
+        {hasClassifications && (
+          <BlunderNav moves={moves} currentIndex={currentIndex} onJump={onJump} />
+        )}
       </div>
 
-      {hasClassifications && (
-        <div className="flex items-center gap-3 px-2 py-1.5 border-b border-gray-800 flex-wrap">
-          {QUALITY_SUMMARY.map(({ label, emoji, color, title }) => {
-            const count = countClassification(moves, label)
-            if (count === 0) return null
-            return (
-              <span key={label} className={`flex items-center gap-0.5 text-xs ${color}`} title={title}>
-                <span>{emoji}</span>
-                <span className="font-mono font-bold">{count}</span>
-              </span>
-            )
-          })}
-          <BlunderNav moves={moves} currentIndex={currentIndex} onJump={onJump} />
-        </div>
-      )}
+      {/* Move list */}
       <div className="flex-1 overflow-y-auto">
         {pairs.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">No moves yet</p>
+          <div className="flex flex-col items-center justify-center py-8 gap-2">
+            <span className="text-2xl opacity-30">♟</span>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No moves yet</p>
+          </div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm border-collapse">
             <tbody>
               {pairs.map(([white, black], pairIdx) => {
                 const wIdx = pairIdx * 2
                 const bIdx = pairIdx * 2 + 1
+                const isWhiteActive = currentIndex === wIdx
+                const isBlackActive = currentIndex === bIdx
+
                 return (
-                  <tr key={pairIdx} className="border-b border-gray-800">
-                    <td className="w-8 text-center text-gray-500 text-xs py-1 select-none">
-                      {pairIdx + 1}.
+                  <tr
+                    key={pairIdx}
+                    style={{ borderBottom: '1px solid var(--border-subtle)' }}
+                  >
+                    <td
+                      className="w-7 text-center text-[11px] py-1 select-none"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      {pairIdx + 1}
                     </td>
-                    <td className="w-1/2 py-0.5 pr-1">
+                    <td className="w-1/2 py-0.5 pr-0.5">
                       {white && (
                         <button
-                          ref={currentIndex === wIdx ? activeRef : undefined}
+                          ref={isWhiteActive ? activeRef : undefined}
                           onClick={() => onJump(wIdx)}
-                          className={`w-full text-left px-2 py-0.5 rounded text-sm font-mono transition-colors ${
-                            currentIndex === wIdx
-                              ? 'bg-blue-600 text-white'
-                              : 'text-gray-200 hover:bg-gray-700'
-                          }`}
+                          className="w-full text-left px-2 py-1 rounded-lg text-xs font-mono transition-all duration-150"
+                          style={isWhiteActive ? {
+                            background: 'var(--accent-indigo)',
+                            color: '#fff',
+                            boxShadow: '0 0 10px rgba(99,102,241,0.3)',
+                          } : {
+                            color: 'var(--text-secondary)',
+                          }}
+                          onMouseEnter={e => {
+                            if (!isWhiteActive)
+                              (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-overlay)'
+                          }}
+                          onMouseLeave={e => {
+                            if (!isWhiteActive)
+                              (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                          }}
                         >
                           {white.san}
                           {white.classification && (
-                            <span className="ml-1 text-xs" style={{ color: white.classification.color }}>
+                            <span className="ml-1 text-[10px]" style={{ color: white.classification.color }}>
                               {white.classification.emoji}
                             </span>
                           )}
                         </button>
                       )}
                     </td>
-                    <td className="w-1/2 py-0.5 pl-1">
+                    <td className="w-1/2 py-0.5 pl-0.5">
                       {black && (
                         <button
-                          ref={currentIndex === bIdx ? activeRef : undefined}
+                          ref={isBlackActive ? activeRef : undefined}
                           onClick={() => onJump(bIdx)}
-                          className={`w-full text-left px-2 py-0.5 rounded text-sm font-mono transition-colors ${
-                            currentIndex === bIdx
-                              ? 'bg-blue-600 text-white'
-                              : 'text-gray-200 hover:bg-gray-700'
-                          }`}
+                          className="w-full text-left px-2 py-1 rounded-lg text-xs font-mono transition-all duration-150"
+                          style={isBlackActive ? {
+                            background: 'var(--accent-indigo)',
+                            color: '#fff',
+                            boxShadow: '0 0 10px rgba(99,102,241,0.3)',
+                          } : {
+                            color: 'var(--text-secondary)',
+                          }}
+                          onMouseEnter={e => {
+                            if (!isBlackActive)
+                              (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-overlay)'
+                          }}
+                          onMouseLeave={e => {
+                            if (!isBlackActive)
+                              (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                          }}
                         >
                           {black.san}
                           {black.classification && (
-                            <span className="ml-1 text-xs" style={{ color: black.classification.color }}>
+                            <span className="ml-1 text-[10px]" style={{ color: black.classification.color }}>
                               {black.classification.emoji}
                             </span>
                           )}
