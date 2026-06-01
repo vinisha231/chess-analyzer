@@ -9,19 +9,33 @@ export default function MaterialBar({ white, black }: Props) {
   const diff = white - black
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>Material</span>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'var(--text-muted)' }}>
+          Material
+        </span>
         {diff !== 0 && (
-          <span className={diff > 0 ? 'text-gray-300' : 'text-gray-400'}>
+          <span
+            className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md"
+            style={{
+              color: diff > 0 ? 'var(--text-primary)' : 'var(--text-secondary)',
+              background: diff > 0 ? 'rgba(255,255,255,0.05)' : 'transparent',
+            }}
+          >
             {diff > 0 ? `White +${diff}` : `Black +${Math.abs(diff)}`}
           </span>
         )}
       </div>
-      <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+      <div
+        className="relative h-1.5 w-full rounded-full overflow-hidden"
+        style={{ background: 'var(--bg-overlay)' }}
+      >
         <div
-          className="h-full bg-gray-200 transition-all duration-300"
-          style={{ width: `${whitePercent}%` }}
+          className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+          style={{
+            width: `${whitePercent}%`,
+            background: 'linear-gradient(90deg, #e2e8f0, #f8fafc)',
+          }}
         />
       </div>
     </div>

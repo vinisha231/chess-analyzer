@@ -19,38 +19,80 @@ export default function GameReviewBanner({ game, username, onClear }: Props) {
   const opening = getOpeningFromPGN(game.pgn)
   const eco = getECOCodeFromPGN(game.pgn)
 
-  const resultColor = result === 'win' ? 'text-green-400' : result === 'loss' ? 'text-red-400' : 'text-gray-400'
-  const resultLabel = result === 'win' ? 'Won' : result === 'loss' ? 'Lost' : 'Draw'
+  const resultConfig = {
+    win:  { color: '#4ade80', bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.20)', label: 'Won' },
+    loss: { color: '#f87171', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.20)', label: 'Lost' },
+    draw: { color: 'var(--text-muted)', bg: 'var(--bg-elevated)', border: 'var(--border-muted)', label: 'Draw' },
+  }[result]
 
   return (
-    <div className="bg-gray-800/80 border border-gray-700 rounded-lg px-3 py-2 flex items-center gap-3 text-xs shrink-0">
+    <div
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl shrink-0"
+      style={{
+        background: resultConfig.bg,
+        border: `1px solid ${resultConfig.border}`,
+      }}
+    >
+      {/* Result badge */}
+      <span
+        className="text-xs font-bold shrink-0 px-2 py-0.5 rounded-md"
+        style={{
+          color: resultConfig.color,
+          background: 'rgba(0,0,0,0.2)',
+        }}
+      >
+        {resultConfig.label}
+      </span>
+
+      {/* Game details */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={`font-bold ${resultColor}`}>{resultLabel}</span>
-          <span className="text-gray-500">vs</span>
-          <span className="text-gray-300 font-medium truncate">{opp.username} ({opp.rating})</span>
-          <span className="text-gray-600">·</span>
-          <span className="text-gray-500">{formatTimeControl(game.time_control)} {game.time_class}</span>
+        <div className="flex items-center gap-1.5 flex-wrap text-xs">
+          <span style={{ color: 'var(--text-muted)' }}>vs</span>
+          <span className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+            {opp.username}
+          </span>
+          <span style={{ color: 'var(--text-muted)' }}>({opp.rating})</span>
+          <span style={{ color: 'var(--border-muted)' }}>·</span>
+          <span style={{ color: 'var(--text-muted)' }}>
+            {formatTimeControl(game.time_control)} {game.time_class}
+          </span>
           {accuracy !== null && (
             <>
-              <span className="text-gray-600">·</span>
-              <span className={accuracy >= 85 ? 'text-green-400' : accuracy >= 70 ? 'text-yellow-400' : 'text-red-400'}>
+              <span style={{ color: 'var(--border-muted)' }}>·</span>
+              <span
+                className="font-mono font-bold"
+                style={{ color: accuracy >= 85 ? '#4ade80' : accuracy >= 70 ? '#fbbf24' : '#f87171' }}
+              >
                 You {accuracy.toFixed(0)}%
               </span>
               {oppAccuracy !== null && (
-                <span className="text-gray-500">vs {oppAccuracy.toFixed(0)}%</span>
+                <span style={{ color: 'var(--text-muted)' }}>vs {oppAccuracy.toFixed(0)}%</span>
               )}
             </>
           )}
         </div>
         {opening && (
-          <p className="text-gray-500 truncate mt-0.5">
-            {eco && <span className="text-gray-600 font-mono mr-1">{eco}</span>}
+          <p className="text-[10px] truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>
+            {eco && <span className="font-mono mr-1">{eco}</span>}
             {opening}
           </p>
         )}
       </div>
-      <button onClick={onClear} className="text-gray-600 hover:text-gray-300 transition-colors shrink-0 text-base leading-none">×</button>
+
+      {/* Close button */}
+      <button
+        onClick={onClear}
+        className="w-6 h-6 flex items-center justify-center rounded-lg text-base leading-none transition-all shrink-0"
+        style={{ color: 'var(--text-muted)' }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.07)'
+          ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+          ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+        }}
+      >×</button>
     </div>
   )
 }
