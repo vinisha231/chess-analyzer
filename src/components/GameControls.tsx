@@ -13,6 +13,45 @@ interface Props {
   onOpenSettings: () => void
 }
 
+interface BtnProps {
+  title: string
+  onClick: () => void
+  disabled?: boolean
+  children: React.ReactNode
+  accent?: boolean
+}
+
+function Btn({ title, onClick, disabled, children, accent }: BtnProps) {
+  return (
+    <button
+      title={title}
+      onClick={onClick}
+      disabled={disabled}
+      className="relative p-2 rounded-lg transition-all duration-150 disabled:opacity-25 disabled:cursor-not-allowed group"
+      style={{
+        background: 'transparent',
+        color: 'var(--text-secondary)',
+      }}
+      onMouseEnter={e => {
+        if (!disabled) {
+          (e.currentTarget as HTMLButtonElement).style.background = accent
+            ? 'rgba(99,102,241,0.15)'
+            : 'var(--bg-overlay)'
+          ;(e.currentTarget as HTMLButtonElement).style.color = accent
+            ? 'var(--accent-indigo)'
+            : 'var(--text-primary)'
+        }
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 export default function GameControls({
   canUndo,
   onUndo, onReset, onFlip,
@@ -20,65 +59,36 @@ export default function GameControls({
   canGoPrev, canGoNext,
   onOpenPGN, onOpenSettings,
 }: Props) {
-  const btn = "p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-  const icon = "text-gray-300 hover:text-white hover:bg-gray-700"
-
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-1">
-        <button
-          title="First move"
-          onClick={onFirst}
-          disabled={!canGoPrev}
-          className={`${btn} ${icon}`}
-        >⏮</button>
-        <button
-          title="Previous move"
-          onClick={onPrev}
-          disabled={!canGoPrev}
-          className={`${btn} ${icon}`}
-        >◀</button>
-        <button
-          title="Next move"
-          onClick={onNext}
-          disabled={!canGoNext}
-          className={`${btn} ${icon}`}
-        >▶</button>
-        <button
-          title="Last move"
-          onClick={onLast}
-          disabled={!canGoNext}
-          className={`${btn} ${icon}`}
-        >⏭</button>
-        <div className="w-px h-5 bg-gray-700 mx-1" />
-        <button
-          title="Flip board"
-          onClick={onFlip}
-          className={`${btn} ${icon}`}
-        >⇅</button>
-        <button
-          title="Undo move"
-          onClick={onUndo}
-          disabled={!canUndo}
-          className={`${btn} ${icon}`}
-        >↩</button>
-        <button
-          title="New game"
-          onClick={onReset}
-          className={`${btn} ${icon}`}
-        >⊕</button>
-        <div className="w-px h-5 bg-gray-700 mx-1" />
-        <button
-          title="PGN / FEN"
-          onClick={onOpenPGN}
-          className={`${btn} ${icon} text-xs font-bold`}
-        >PGN</button>
-        <button
-          title="Settings"
-          onClick={onOpenSettings}
-          className={`${btn} ${icon}`}
-        >⚙</button>
-      </div>
+    <div
+      className="flex items-center gap-0.5 rounded-xl px-2 py-1"
+      style={{
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
+      }}
+    >
+      {/* Navigation */}
+      <Btn title="First move (↑)" onClick={onFirst} disabled={!canGoPrev}>⏮</Btn>
+      <Btn title="Previous move (←)" onClick={onPrev} disabled={!canGoPrev}>◀</Btn>
+      <Btn title="Next move (→)" onClick={onNext} disabled={!canGoNext}>▶</Btn>
+      <Btn title="Last move (↓)" onClick={onLast} disabled={!canGoNext}>⏭</Btn>
+
+      {/* Divider */}
+      <div className="w-px h-5 mx-1" style={{ background: 'var(--border-muted)' }} />
+
+      {/* Board actions */}
+      <Btn title="Flip board (F)" onClick={onFlip}>⇅</Btn>
+      <Btn title="Undo move" onClick={onUndo} disabled={!canUndo}>↩</Btn>
+      <Btn title="New game" onClick={onReset} accent>⊕</Btn>
+
+      {/* Divider */}
+      <div className="w-px h-5 mx-1" style={{ background: 'var(--border-muted)' }} />
+
+      {/* Panels */}
+      <Btn title="PGN / FEN import" onClick={onOpenPGN} accent>
+        <span className="text-xs font-bold">PGN</span>
+      </Btn>
+      <Btn title="Settings" onClick={onOpenSettings}>⚙</Btn>
     </div>
   )
 }
