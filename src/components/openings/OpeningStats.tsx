@@ -10,6 +10,23 @@ interface Props {
   onReset: () => void
 }
 
+function StatCard({ value, label, color }: { value: string; label: string; color?: string }) {
+  return (
+    <div
+      className="flex-1 flex flex-col items-center py-3 rounded-xl"
+      style={{
+        background: 'var(--bg-overlay)',
+        border: '1px solid var(--border-subtle)',
+      }}
+    >
+      <p className="text-2xl font-bold leading-none mb-1" style={{ color: color ?? 'var(--text-primary)' }}>
+        {value}
+      </p>
+      <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{label}</p>
+    </div>
+  )
+}
+
 export default function OpeningStats({ progress, totalLearned, totalFavorites, averageScore, onReset }: Props) {
   const total = ALL_OPENINGS.length
   const completePct = total > 0 ? (totalLearned / total) * 100 : 0
@@ -27,89 +44,135 @@ export default function OpeningStats({ progress, totalLearned, totalFavorites, a
     return { cat, catOpenings, catLearned, catAvgScore }
   })
 
-  // Best and worst openings
   const studied = Object.values(progress).filter(p => p.practiceCount > 0)
   const bestScore = studied.reduce((best, p) => p.quizScore > (best?.quizScore ?? 0) ? p : best, null as OpeningProgress | null)
   const worstScore = studied.reduce((worst, p) => p.quizScore < (worst?.quizScore ?? 100) ? p : worst, null as OpeningProgress | null)
 
   const getOpeningName = (id: string) => ALL_OPENINGS.find(o => o.id === id)?.name ?? id
 
+  const scoreColor = averageScore >= 80 ? '#4ade80' : averageScore >= 50 ? '#fbbf24' : '#f87171'
+
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto">
+    <div className="flex flex-col gap-3 overflow-y-auto">
       {/* Overview */}
-      <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700">
-        <h3 className="text-sm font-bold text-white mb-3">Your Progress</h3>
-        <div className="flex gap-4 mb-3">
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-bold text-white">{totalLearned}</p>
-            <p className="text-xs text-gray-500">Studied</p>
-          </div>
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-bold text-yellow-400">{totalFavorites}</p>
-            <p className="text-xs text-gray-500">Favorites</p>
-          </div>
-          <div className="flex-1 text-center">
-            <p className={`text-2xl font-bold ${averageScore >= 80 ? 'text-green-400' : averageScore >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
-              {averageScore.toFixed(0)}%
-            </p>
-            <p className="text-xs text-gray-500">Avg score</p>
-          </div>
+      <div
+        className="rounded-xl p-4"
+        style={{
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        <p
+          className="text-[9px] uppercase tracking-widest font-bold mb-3"
+          style={{ color: 'var(--accent-indigo)' }}
+        >
+          Your Progress
+        </p>
+        <div className="flex gap-2 mb-4">
+          <StatCard value={String(totalLearned)} label="Studied" color="var(--text-primary)" />
+          <StatCard value={String(totalFavorites)} label="Favorites" color="var(--accent-gold)" />
+          <StatCard value={`${averageScore.toFixed(0)}%`} label="Avg score" color={scoreColor} />
         </div>
         <div>
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+          <div className="flex justify-between text-[10px] mb-1.5" style={{ color: 'var(--text-muted)' }}>
             <span>Overall completion</span>
-            <span>{totalLearned}/{total} openings</span>
+            <span style={{ color: 'var(--accent-indigo)' }}>{totalLearned}/{total} openings</span>
           </div>
-          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg-overlay)' }}>
             <div
-              className="h-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all"
-              style={{ width: `${completePct}%` }}
+              className="h-full rounded-full transition-all duration-700"
+              style={{
+                width: `${completePct}%`,
+                background: 'linear-gradient(90deg, var(--accent-indigo), var(--accent-purple))',
+              }}
             />
           </div>
         </div>
       </div>
 
       {/* Category breakdown */}
-      <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700">
-        <h3 className="text-sm font-bold text-white mb-3">By Category</h3>
-        <div className="flex flex-col gap-2">
-          {categoryStats.map(({ cat, catOpenings, catLearned, catAvgScore }) => (
-            <div key={cat}>
-              <div className="flex items-center justify-between text-xs mb-0.5">
-                <span className="text-gray-300 flex items-center gap-1">
-                  <span>{CATEGORY_ICONS[cat]}</span>
-                  <span>{CATEGORY_LABELS[cat].split(' (')[0]}</span>
-                </span>
-                <span className="text-gray-500">{catLearned}/{catOpenings.length}</span>
+      <div
+        className="rounded-xl p-4"
+        style={{
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        <p
+          className="text-[9px] uppercase tracking-widest font-bold mb-3"
+          style={{ color: 'var(--accent-indigo)' }}
+        >
+          By Category
+        </p>
+        <div className="flex flex-col gap-3">
+          {categoryStats.map(({ cat, catOpenings, catLearned, catAvgScore }) => {
+            const pct = catOpenings.length > 0 ? (catLearned / catOpenings.length) * 100 : 0
+            return (
+              <div key={cat}>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="flex items-center gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+                    <span>{CATEGORY_ICONS[cat]}</span>
+                    <span>{CATEGORY_LABELS[cat].split(' (')[0]}</span>
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {catAvgScore > 0 && (
+                      <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                        avg {catAvgScore.toFixed(0)}%
+                      </span>
+                    )}
+                    <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                      {catLearned}/{catOpenings.length}
+                    </span>
+                  </div>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-overlay)' }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${pct}%`,
+                      background: 'linear-gradient(90deg, var(--accent-indigo), var(--accent-purple))',
+                    }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-500 rounded-full transition-all"
-                  style={{ width: `${catOpenings.length > 0 ? (catLearned / catOpenings.length) * 100 : 0}%` }}
-                />
-              </div>
-              {catAvgScore > 0 && (
-                <p className="text-[10px] text-gray-600 text-right">avg {catAvgScore.toFixed(0)}%</p>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
-      {/* Best/Worst */}
+      {/* Highlights */}
       {studied.length > 0 && (
-        <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700">
-          <h3 className="text-sm font-bold text-white mb-3">Highlights</h3>
+        <div
+          className="rounded-xl p-4"
+          style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
+          <p
+            className="text-[9px] uppercase tracking-widest font-bold mb-3"
+            style={{ color: 'var(--accent-indigo)' }}
+          >
+            Highlights
+          </p>
           {bestScore && (
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-gray-400">🏆 Best</span>
-              <span className="text-xs text-green-400 font-medium">{getOpeningName(bestScore.openingId)} ({bestScore.quizScore.toFixed(0)}%)</span>
+              <span className="text-xs flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                🏆 <span>Best</span>
+              </span>
+              <span className="text-xs font-medium truncate ml-2" style={{ color: '#4ade80' }}>
+                {getOpeningName(bestScore.openingId)} ({bestScore.quizScore.toFixed(0)}%)
+              </span>
             </div>
           )}
           {worstScore && worstScore !== bestScore && (
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">📖 Needs work</span>
-              <span className="text-xs text-red-400 font-medium">{getOpeningName(worstScore.openingId)} ({worstScore.quizScore.toFixed(0)}%)</span>
+              <span className="text-xs flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                📖 <span>Needs work</span>
+              </span>
+              <span className="text-xs font-medium truncate ml-2" style={{ color: '#f87171' }}>
+                {getOpeningName(worstScore.openingId)} ({worstScore.quizScore.toFixed(0)}%)
+              </span>
             </div>
           )}
         </div>
@@ -121,7 +184,16 @@ export default function OpeningStats({ progress, totalLearned, totalFavorites, a
           onClick={() => {
             if (window.confirm('Reset all opening progress? This cannot be undone.')) onReset()
           }}
-          className="text-xs text-gray-600 hover:text-red-400 transition-colors text-center py-1"
+          className="text-xs text-center py-2 transition-all rounded-lg"
+          style={{ color: 'var(--text-muted)' }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.color = '#f87171'
+            ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.05)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+            ;(e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+          }}
         >
           Reset all progress
         </button>
