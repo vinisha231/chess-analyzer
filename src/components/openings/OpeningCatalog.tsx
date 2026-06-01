@@ -26,7 +26,7 @@ export default function OpeningCatalog({ progress, onLearn, onQuiz, onToggleFavo
     { value: 'all', label: 'All', icon: '📚' },
     ...(['open', 'semi-open', 'closed', 'semi-closed', 'flank'] as OpeningCategory[]).map(c => ({
       value: c,
-      label: CATEGORY_LABELS[c].split(' (')[0], // Shorten label
+      label: CATEGORY_LABELS[c].split(' (')[0],
       icon: CATEGORY_ICONS[c],
     })),
   ]
@@ -44,17 +44,9 @@ export default function OpeningCatalog({ progress, onLearn, onQuiz, onToggleFavo
       )
     }
 
-    if (categoryFilter !== 'all') {
-      list = list.filter(o => o.category === categoryFilter)
-    }
-
-    if (difficultyFilter !== 'all') {
-      list = list.filter(o => o.difficulty === difficultyFilter)
-    }
-
-    if (showFavoritesOnly) {
-      list = list.filter(o => isFavorite(o.id))
-    }
+    if (categoryFilter !== 'all') list = list.filter(o => o.category === categoryFilter)
+    if (difficultyFilter !== 'all') list = list.filter(o => o.difficulty === difficultyFilter)
+    if (showFavoritesOnly) list = list.filter(o => isFavorite(o.id))
 
     if (sortMode === 'difficulty') {
       const order = { beginner: 0, intermediate: 1, advanced: 2 }
@@ -71,59 +63,90 @@ export default function OpeningCatalog({ progress, onLearn, onQuiz, onToggleFavo
   const totalLearned = Object.values(progress).filter(p => p.practiceCount > 0).length
 
   return (
-    <div className="flex flex-col gap-3 h-full min-h-0">
-      {/* Stats row */}
-      <div className="flex items-center gap-3 px-1 shrink-0">
+    <div className="flex flex-col gap-2.5 h-full min-h-0">
+      {/* Progress mini bar */}
+      <div className="flex items-center gap-3 shrink-0">
         <div className="flex-1">
-          <span className="text-xs text-gray-500">
-            <span className="text-white font-bold">{totalLearned}</span>
-            <span> / {ALL_OPENINGS.length} openings studied</span>
-          </span>
-          <div className="h-1 bg-gray-700 rounded-full mt-1 overflow-hidden">
+          <div className="flex items-center justify-between text-[10px] mb-1" style={{ color: 'var(--text-muted)' }}>
+            <span>
+              <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{totalLearned}</span>
+              {' / '}{ALL_OPENINGS.length} studied
+            </span>
+            <span style={{ color: 'var(--accent-indigo)' }}>
+              {Math.round((totalLearned / ALL_OPENINGS.length) * 100)}%
+            </span>
+          </div>
+          <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--bg-overlay)' }}>
             <div
-              className="h-full bg-blue-500 rounded-full transition-all"
-              style={{ width: `${(totalLearned / ALL_OPENINGS.length) * 100}%` }}
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${(totalLearned / ALL_OPENINGS.length) * 100}%`,
+                background: 'linear-gradient(90deg, var(--accent-indigo), var(--accent-purple))',
+              }}
             />
           </div>
         </div>
-        <div
-          className="bg-yellow-900/30 border border-yellow-800/50 rounded-lg px-2 py-1 cursor-pointer hover:bg-yellow-900/50 transition-colors"
+        <button
           onClick={() => onLearn(daily)}
           title="Opening of the day"
+          className="shrink-0 px-2 py-1 rounded-lg transition-all"
+          style={{
+            background: 'rgba(245,158,11,0.10)',
+            border: '1px solid rgba(245,158,11,0.20)',
+          }}
+          onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.18)'}
+          onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'rgba(245,158,11,0.10)'}
         >
-          <p className="text-[10px] text-yellow-400">⭐ Daily</p>
-          <p className="text-xs text-yellow-300 font-medium truncate max-w-24">{daily.name}</p>
-        </div>
+          <p className="text-[9px] font-bold" style={{ color: 'var(--accent-gold)' }}>⭐ Daily</p>
+          <p className="text-[10px] font-medium truncate max-w-24" style={{ color: 'var(--accent-gold)' }}>
+            {daily.name}
+          </p>
+        </button>
       </div>
 
       {/* Search */}
       <div className="relative shrink-0">
         <input
           type="text"
-          placeholder="Search openings by name, ECO, or keyword…"
+          placeholder="Search by name, ECO, or keyword…"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500 pr-7"
+          className="w-full px-3 py-2 rounded-xl text-xs outline-none transition-all"
+          style={{
+            background: 'var(--bg-overlay)',
+            border: '1px solid var(--border-muted)',
+            color: 'var(--text-primary)',
+          }}
+          onFocus={e => (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-accent)'}
+          onBlur={e => (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-muted)'}
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-base leading-none"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-base leading-none transition-all"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'}
+            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'}
           >×</button>
         )}
       </div>
 
-      {/* Category filter */}
+      {/* Category filter pills */}
       <div className="flex gap-1 flex-wrap shrink-0">
         {categories.map(c => (
           <button
             key={c.value}
             onClick={() => setCategoryFilter(c.value)}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-medium transition-colors ${
-              categoryFilter === c.value
-                ? 'bg-blue-600 border-blue-500 text-white'
-                : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
-            }`}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all"
+            style={categoryFilter === c.value ? {
+              background: 'var(--accent-indigo)',
+              color: '#fff',
+              boxShadow: '0 0 8px rgba(99,102,241,0.3)',
+            } : {
+              background: 'var(--bg-overlay)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-muted)',
+            }}
           >
             <span>{c.icon}</span>
             <span>{c.label}</span>
@@ -138,11 +161,14 @@ export default function OpeningCatalog({ progress, onLearn, onQuiz, onToggleFavo
             <button
               key={d}
               onClick={() => setDifficultyFilter(d)}
-              className={`px-2 py-0.5 rounded text-xs font-medium transition-colors capitalize ${
-                difficultyFilter === d
-                  ? 'bg-gray-600 text-white'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
+              className="px-2 py-0.5 rounded-lg text-[11px] font-medium transition-all capitalize"
+              style={difficultyFilter === d ? {
+                background: 'var(--bg-overlay)',
+                border: '1px solid var(--border-accent)',
+                color: 'var(--text-primary)',
+              } : {
+                color: 'var(--text-muted)',
+              }}
             >
               {d === 'all' ? 'All levels' : DIFFICULTY_LABELS[d]}
             </button>
@@ -150,16 +176,26 @@ export default function OpeningCatalog({ progress, onLearn, onQuiz, onToggleFavo
         </div>
         <button
           onClick={() => setShowFavoritesOnly(f => !f)}
-          className={`ml-auto px-2 py-0.5 rounded text-xs transition-colors ${
-            showFavoritesOnly ? 'text-yellow-400 bg-yellow-900/30' : 'text-gray-500 hover:text-yellow-400'
-          }`}
+          className="ml-auto px-2 py-0.5 rounded-lg text-[11px] transition-all"
+          style={showFavoritesOnly ? {
+            color: 'var(--accent-gold)',
+            background: 'rgba(245,158,11,0.10)',
+            border: '1px solid rgba(245,158,11,0.20)',
+          } : {
+            color: 'var(--text-muted)',
+          }}
         >
           {showFavoritesOnly ? '★ Favorites' : '☆ Favorites'}
         </button>
         <select
           value={sortMode}
           onChange={e => setSortMode(e.target.value as SortMode)}
-          className="bg-gray-800 border border-gray-700 rounded text-xs text-gray-400 px-1.5 py-0.5 focus:outline-none"
+          className="rounded-lg text-[11px] px-2 py-0.5 outline-none cursor-pointer"
+          style={{
+            background: 'var(--bg-overlay)',
+            border: '1px solid var(--border-muted)',
+            color: 'var(--text-secondary)',
+          }}
         >
           <option value="default">Default</option>
           <option value="difficulty">By difficulty</option>
@@ -171,10 +207,15 @@ export default function OpeningCatalog({ progress, onLearn, onQuiz, onToggleFavo
       {/* Results */}
       <div className="flex-1 overflow-y-auto min-h-0">
         {filtered.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-6">No openings match your filters</p>
+          <div className="flex flex-col items-center py-8 gap-2">
+            <span className="text-2xl opacity-20">🔍</span>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No openings match your filters</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-2 pb-2">
-            <p className="text-xs text-gray-600">{filtered.length} opening{filtered.length !== 1 ? 's' : ''}</p>
+          <div className="flex flex-col gap-2 pb-2">
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+              {filtered.length} opening{filtered.length !== 1 ? 's' : ''}
+            </p>
             {filtered.map(opening => (
               <OpeningCard
                 key={opening.id}
