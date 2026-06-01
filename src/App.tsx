@@ -248,50 +248,63 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-      <header className="border-b border-gray-800 px-4 py-3 flex items-center justify-between shrink-0">
+    <div className="min-h-screen text-white flex flex-col" style={{ background: 'var(--bg-base)' }}>
+      {/* Header */}
+      <header className="shrink-0 px-5 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
         <div className="flex items-center gap-3">
-          <span className="text-2xl select-none">♟</span>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl select-none shrink-0"
+            style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', boxShadow: '0 0 16px rgba(99,102,241,0.4)' }}>
+            ♟
+          </div>
           <div>
-            <h1 className="text-lg font-bold leading-tight">Chess Analyzer</h1>
-            <p className="text-xs text-gray-400">Stockfish 18 · Best-move analysis</p>
+            <h1 className="text-base font-bold leading-tight tracking-tight">Chess Analyzer</h1>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Stockfish 18 · Engine analysis</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
-            <button
-              onClick={() => setGameMode('pvp')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${gameMode === 'pvp' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
-            >
-              Player vs Player
-            </button>
-            <button
-              onClick={() => setGameMode('analysis')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${gameMode === 'analysis' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
-            >
-              Analysis Mode
-            </button>
+
+        <div className="flex items-center gap-2">
+          {/* Mode toggle */}
+          <div className="flex p-0.5 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
+            {(['pvp', 'analysis'] as const).map(mode => (
+              <button key={mode}
+                onClick={() => setGameMode(mode)}
+                className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                style={gameMode === mode ? {
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  color: '#fff',
+                  boxShadow: '0 0 12px rgba(99,102,241,0.35)',
+                } : { color: 'var(--text-muted)' }}
+              >
+                {mode === 'pvp' ? 'vs Player' : 'Analysis'}
+              </button>
+            ))}
           </div>
+
           <button
             onClick={() => setShowNameEditor(true)}
-            className="text-xs px-2 py-1 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"
+            className="text-xs px-2.5 py-1.5 rounded-lg transition-all"
+            style={{ color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}
             title="Edit player names"
           >
             ✏ Names
           </button>
-          <span className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
+
+          {/* Status badge */}
+          <span className={`text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+            gameState.isCheck && !gameState.isCheckmate ? 'animate-pulse' : ''
+          }`} style={
             gameState.isCheck && !gameState.isCheckmate
-              ? 'bg-red-900/60 text-red-300 animate-pulse'
+              ? { background: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.3)' }
               : gameState.isGameOver
-              ? 'bg-gray-700 text-gray-300'
-              : 'bg-gray-800 text-gray-400'
-          }`}>
+              ? { background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }
+              : { background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }
+          }>
             {statusText}
           </span>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-[1200px] mx-auto w-full overflow-auto lg:overflow-hidden">
+      <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-[1280px] mx-auto w-full overflow-auto lg:overflow-hidden">
         <div className="flex gap-3 items-start shrink-0 mx-auto lg:mx-0">
           <EvaluationBar
             evaluation={sfResult.evaluation}
@@ -370,24 +383,30 @@ export default function App() {
         </div>
 
         <div className="flex-1 min-w-0 flex flex-col gap-3">
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-1 shrink-0 flex-wrap">
+          {/* Tab navigation */}
+          <div className="flex p-1 rounded-xl shrink-0 flex-wrap gap-0.5"
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
             {([
-              ['analysis', '⚡ Analysis'],
-              ['history',  '📋 Moves'],
-              ['stats',    '📊 Stats'],
-              ['openings', '📖 Openings'],
-              ['chesscom', '♟ chess.com'],
-            ] as const).map(([tab, label]) => (
+              ['analysis', '⚡', 'Analysis'],
+              ['history',  '📋', 'Moves'],
+              ['stats',    '📊', 'Stats'],
+              ['openings', '📖', 'Openings'],
+              ['chesscom', '♟', 'chess.com'],
+            ] as const).map(([tab, icon, label]) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-                  activeTab === tab ? 'bg-gray-600 text-white' : 'text-gray-400 hover:text-white'
-                }`}
+                className="flex-1 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1"
+                style={activeTab === tab ? {
+                  background: 'var(--bg-overlay)',
+                  color: 'var(--text-primary)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                } : { color: 'var(--text-muted)' }}
               >
-                {label}
+                <span>{icon}</span>
+                <span>{label}</span>
                 {tab === 'chesscom' && chessCom.connectionState === 'connected' && (
-                  <span className="ml-1 inline-block w-1.5 h-1.5 bg-green-400 rounded-full" />
+                  <span className="inline-block w-1.5 h-1.5 bg-green-400 rounded-full" />
                 )}
               </button>
             ))}
@@ -401,7 +420,8 @@ export default function App() {
             />
           )}
 
-          <div className="flex-1 bg-gray-800/50 rounded-xl p-3 overflow-hidden flex flex-col min-h-0">
+          <div className="flex-1 rounded-xl p-3 overflow-hidden flex flex-col min-h-0"
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
             {activeTab === 'analysis' && (
               <AnalysisPanel
                 result={sfResult}
@@ -448,22 +468,26 @@ export default function App() {
             )}
           </div>
 
-          <div className="shrink-0 bg-gray-800/30 rounded-xl px-3 py-2 text-xs text-gray-500 flex items-center justify-between">
-            <div>
+          {/* Footer bar */}
+          <div className="shrink-0 rounded-xl px-3 py-2 text-xs flex items-center justify-between"
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowShortcuts(true)}
-                className="font-medium text-gray-400 hover:text-gray-200 transition-colors"
+                className="font-medium transition-colors hover:text-white"
                 title="View all keyboard shortcuts"
+                style={{ color: 'var(--text-secondary)' }}
               >
                 ⌨ Shortcuts
               </button>
-              <span className="ml-2">← → navigate · ↑↓ first/last · F flip · ? help</span>
+              <span style={{ color: 'var(--border-muted)' }}>·</span>
+              <span>← → navigate · F flip · ? help</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-gray-600">{phaseLabel(gamePhase)}</span>
+              <span className="font-medium" style={{ color: 'var(--text-muted)' }}>{phaseLabel(gamePhase)}</span>
               <button
                 onClick={copyFEN}
-                className="text-gray-500 hover:text-gray-300 transition-colors font-mono text-xs"
+                className="transition-colors font-mono hover:text-white"
                 title="Copy FEN to clipboard"
               >
                 Copy FEN
