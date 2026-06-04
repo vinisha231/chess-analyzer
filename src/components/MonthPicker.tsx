@@ -12,6 +12,7 @@ export default function MonthPicker({ year, month, onChange }: Props) {
   const isMin = year <= 2012
 
   function prev() {
+    if (isMin) return
     if (month === 1) onChange(year - 1, 12)
     else onChange(year, month - 1)
   }
@@ -21,21 +22,54 @@ export default function MonthPicker({ year, month, onChange }: Props) {
     else onChange(year, month + 1)
   }
 
+  const navBtn = (disabled: boolean): React.CSSProperties => ({
+    width: 28,
+    height: 28,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    border: '1px solid var(--border-subtle)',
+    background: 'var(--bg-overlay)',
+    color: disabled ? 'var(--text-muted)' : 'var(--text-secondary)',
+    opacity: disabled ? 0.35 : 1,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontSize: 16,
+    lineHeight: 1,
+    transition: 'all 0.15s',
+  })
+
   return (
     <div className="flex items-center justify-between gap-2">
       <button
         onClick={prev}
         disabled={isMin}
-        className="p-1 text-gray-400 hover:text-white disabled:opacity-30 transition-colors text-lg leading-none"
-      >‹</button>
-      <span className="text-sm font-medium text-gray-200 flex-1 text-center">
-        {MONTHS[month - 1]} {year}
+        style={navBtn(isMin)}
+        onMouseEnter={e => { if (!isMin) (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)' }}
+        onMouseLeave={e => { if (!isMin) (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)' }}
+        aria-label="Previous month"
+      >
+        ‹
+      </button>
+
+      <span
+        className="flex-1 text-center text-sm font-semibold"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        {MONTHS[month - 1]}{' '}
+        <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{year}</span>
       </span>
+
       <button
         onClick={next}
         disabled={isMax}
-        className="p-1 text-gray-400 hover:text-white disabled:opacity-30 transition-colors text-lg leading-none"
-      >›</button>
+        style={navBtn(isMax)}
+        onMouseEnter={e => { if (!isMax) (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)' }}
+        onMouseLeave={e => { if (!isMax) (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)' }}
+        aria-label="Next month"
+      >
+        ›
+      </button>
     </div>
   )
 }
