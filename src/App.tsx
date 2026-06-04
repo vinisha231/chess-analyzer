@@ -22,6 +22,7 @@ import GameReviewBanner from './components/GameReviewBanner'
 import ShortcutsModal from './components/ShortcutsModal'
 import Toast from './components/Toast'
 import OpeningsPanel from './components/openings/OpeningsPanel'
+import EvalChart from './components/EvalChart'
 import { useChessCom } from './hooks/useChessCom'
 import type { ChessComGame } from './utils/chesscomApi'
 import type { GameSettings } from './types'
@@ -363,7 +364,11 @@ export default function App() {
               total={gameState.moveHistory.length}
               onJump={goToMove}
             />
-            <PositionInfo fen={gameState.fen} moveCount={gameState.moveHistory.length} />
+            <PositionInfo
+              fen={gameState.fen}
+              moveCount={gameState.moveHistory.length}
+              onCopyFen={copyFEN}
+            />
 
             <GameControls
               canUndo={gameState.moveHistory.length > 0}
@@ -438,7 +443,14 @@ export default function App() {
               />
             )}
             {activeTab === 'stats' && (
-              <GameStats moves={gameState.moveHistory} playerNames={playerNames} />
+              <div className="flex flex-col gap-3 overflow-y-auto">
+                <EvalChart
+                  moves={gameState.moveHistory}
+                  currentIndex={gameState.currentMoveIndex}
+                  onJump={goToMove}
+                />
+                <GameStats moves={gameState.moveHistory} playerNames={playerNames} />
+              </div>
             )}
             {activeTab === 'openings' && (
               <OpeningsPanel
