@@ -12,6 +12,33 @@ function countClassification(moves: MoveRecord[], color: 'w' | 'b', label: strin
     .filter(m => m.classification?.label === label).length
 }
 
+const STATS = [
+  { label: 'brilliant', display: '✨ Brilliant', color: '#22d3ee' },
+  { label: 'best',      display: '★ Best',       color: '#4ade80' },
+  { label: 'excellent', display: '! Excellent',  color: '#86efac' },
+  { label: 'good',      display: '⊙ Good',       color: '#a3e635' },
+  { label: 'inaccuracy',display: '?! Inaccuracy',color: '#fbbf24' },
+  { label: 'mistake',   display: '? Mistake',    color: '#fb923c' },
+  { label: 'blunder',   display: '?? Blunder',   color: '#f87171' },
+] as const
+
+function AccBar({ white, black }: { white: number; black: number }) {
+  const total = white + black || 1
+  const whitePct = (white / total) * 100
+  return (
+    <div className="h-1.5 rounded-full overflow-hidden flex" style={{ background: 'var(--bg-overlay)' }}>
+      <div
+        className="h-full rounded-l-full transition-all duration-700"
+        style={{ width: `${whitePct}%`, background: 'linear-gradient(90deg, #f8fafc, #e2e8f0)' }}
+      />
+      <div className="h-full flex-1" style={{ background: 'linear-gradient(90deg, #1e2030, #0f1117)' }} />
+    </div>
+  )
+}
+
+const accColor = (acc: number) =>
+  acc >= 90 ? '#4ade80' : acc >= 75 ? '#fbbf24' : '#f87171'
+
 export default function GameStats({ moves, playerNames }: Props) {
   const whiteMoves = moves.filter((_, i) => i % 2 === 0)
   const blackMoves = moves.filter((_, i) => i % 2 === 1)
@@ -19,69 +46,140 @@ export default function GameStats({ moves, playerNames }: Props) {
   const whiteAcc = calculateAccuracy(whiteMoves)
   const blackAcc = calculateAccuracy(blackMoves)
 
-  const stats = ['brilliant', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder'] as const
+  const hasClassifications = moves.filter(m => m.classification).length > 0
 
-  const statLabels: Record<string, string> = {
-    brilliant: '✨ Brilliant', best: '✨ Best', excellent: '! Excellent',
-    good: '⊙ Good', inaccuracy: '?! Inaccuracy', mistake: '? Mistake', blunder: '?? Blunder',
-  }
-
-  const statColors: Record<string, string> = {
-    brilliant: 'text-teal-400', best: 'text-green-400', excellent: 'text-green-300',
-    good: 'text-lime-400', inaccuracy: 'text-yellow-400', mistake: 'text-orange-400', blunder: 'text-red-400',
-  }
-
-  if (moves.filter(m => m.classification).length === 0) {
+  if (!hasClassifications) {
     return (
-      <div className="text-gray-500 text-xs text-center py-4">
-        Analysis stats appear after the game ends
+      <div className="flex flex-col items-center py-8 gap-2">
+        <span className="text-2xl opacity-20">📊</span>
+        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+          Stats appear after game review
+        </p>
       </div>
     )
   }
 
-  const accColor = (acc: number) =>
-    acc >= 90 ? 'text-green-400' : acc >= 75 ? 'text-yellow-400' : 'text-red-400'
-
   return (
     <div className="flex flex-col gap-3">
-      {/* Accuracy */}
-      <div className="bg-gray-800/60 rounded-lg px-3 py-2">
-        <p className="text-xs text-gray-500 text-center mb-2">Accuracy</p>
-        <div className="flex items-center gap-2">
+      {/* Accuracy card */}
+      <div
+        className="rounded-xl px-4 py-3"
+        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}
+      >
+        <p
+          className="text-[9px] uppercase tracking-widest font-bold mb-3"
+          style={{ color: 'var(--accent-indigo)' }}
+        >
+          Accuracy
+        </p>
+
+        <div className="flex items-center gap-4 mb-3">
           <div className="flex-1 text-right">
-            <span className={`text-2xl font-bold font-mono ${accColor(whiteAcc)}`}>{whiteAcc.toFixed(0)}<span className="text-base">%</span></span>
-            <p className="text-xs text-gray-400 mt-0.5">{playerNames.white}</p>
+            <span className="text-2xl font-bold font-mono leading-none" style={{ color: accColor(whiteAcc) }}>
+              {whiteAcc.toFixed(0)}<span className="text-sm">%</span>
+            </span>
+            <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
+              ♙ {playerNames.white}
+            </p>
           </div>
-          <div className="w-px h-10 bg-gray-700 shrink-0" />
+
+          <div className="w-px h-10 shrink-0" style={{ background: 'var(--border-muted)' }} />
+
           <div className="flex-1 text-left">
-            <span className={`text-2xl font-bold font-mono ${accColor(blackAcc)}`}>{blackAcc.toFixed(0)}<span className="text-base">%</span></span>
-            <p className="text-xs text-gray-400 mt-0.5">{playerNames.black}</p>
+            <span className="text-2xl font-bold font-mono leading-none" style={{ color: accColor(blackAcc) }}>
+              {blackAcc.toFixed(0)}<span className="text-sm">%</span>
+            </span>
+            <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
+              ♟ {playerNames.black}
+            </p>
           </div>
         </div>
-        {/* Relative accuracy bar */}
-        <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden flex">
-          <div
-            className="h-full bg-white transition-all duration-700"
-            style={{ width: `${(whiteAcc / (whiteAcc + blackAcc)) * 100}%` }}
-          />
-          <div className="h-full bg-gray-500 flex-1" />
+
+        <AccBar white={whiteAcc} black={blackAcc} />
+        <div className="flex justify-between text-[9px] mt-1" style={{ color: 'var(--text-muted)' }}>
+          <span>White</span>
+          <span>Black</span>
         </div>
       </div>
 
-      <div className="flex flex-col gap-0.5">
-        {stats.map(stat => (
-          <div key={stat} className="flex items-center gap-2 text-xs">
-            <span className={`w-24 ${statColors[stat]}`}>{statLabels[stat]}</span>
-            <span className="text-gray-400 w-4 text-center">{countClassification(moves, 'w', stat)}</span>
-            <div className="flex-1 relative h-1.5 bg-gray-700 rounded">
-              <div className="absolute left-0 top-0 h-full bg-white/20 rounded"
-                style={{ width: `${(countClassification(moves, 'w', stat) / Math.max(whiteMoves.length, 1)) * 100}%` }} />
-              <div className="absolute right-0 top-0 h-full bg-gray-500/30 rounded"
-                style={{ width: `${(countClassification(moves, 'b', stat) / Math.max(blackMoves.length, 1)) * 100}%` }} />
-            </div>
-            <span className="text-gray-400 w-4 text-center">{countClassification(moves, 'b', stat)}</span>
+      {/* Move quality breakdown */}
+      <div
+        className="rounded-xl px-3 py-3"
+        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}
+      >
+        <p
+          className="text-[9px] uppercase tracking-widest font-bold mb-2.5"
+          style={{ color: 'var(--accent-indigo)' }}
+        >
+          Move quality
+        </p>
+
+        <div className="flex flex-col gap-2">
+          {STATS.map(({ label, display, color }) => {
+            const wCount = countClassification(moves, 'w', label)
+            const bCount = countClassification(moves, 'b', label)
+            if (wCount === 0 && bCount === 0) return null
+            const maxCount = Math.max(wCount, bCount, 1)
+            const wPct = (wCount / maxCount) * 100
+            const bPct = (bCount / maxCount) * 100
+
+            return (
+              <div key={label} className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold w-5 text-right shrink-0" style={{ color: 'var(--text-secondary)' }}>
+                  {wCount || ''}
+                </span>
+
+                <div className="flex-1 flex items-center gap-0.5 min-w-0">
+                  {/* White bar — grows from center leftward */}
+                  <div className="flex-1 flex justify-end">
+                    <div
+                      className="h-1.5 rounded-l-full transition-all duration-500"
+                      style={{
+                        width: `${wPct}%`,
+                        background: `${color}50`,
+                        minWidth: wCount > 0 ? 2 : 0,
+                      }}
+                    />
+                  </div>
+                  <span
+                    className="text-[10px] font-semibold shrink-0 text-center"
+                    style={{ color, width: 80 }}
+                  >
+                    {display}
+                  </span>
+                  {/* Black bar — grows right */}
+                  <div className="flex-1">
+                    <div
+                      className="h-1.5 rounded-r-full transition-all duration-500"
+                      style={{
+                        width: `${bPct}%`,
+                        background: `${color}50`,
+                        minWidth: bCount > 0 ? 2 : 0,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <span className="text-xs font-mono font-bold w-5 shrink-0" style={{ color: 'var(--text-secondary)' }}>
+                  {bCount || ''}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+
+        <div
+          className="flex items-center gap-2 mt-3 pt-2"
+          style={{ borderTop: '1px solid var(--border-subtle)' }}
+        >
+          <span className="text-[9px] w-5 text-right shrink-0" style={{ color: 'var(--text-muted)' }}>W</span>
+          <div className="flex-1 text-center">
+            <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>
+              ♙ {playerNames.white} · {playerNames.black} ♟
+            </span>
           </div>
-        ))}
+          <span className="text-[9px] w-5 shrink-0" style={{ color: 'var(--text-muted)' }}>B</span>
+        </div>
       </div>
     </div>
   )
