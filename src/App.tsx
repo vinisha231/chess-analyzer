@@ -342,11 +342,34 @@ export default function App() {
                 }}
               />
               {gameState.isCheck && !gameState.isCheckmate && (
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg pointer-events-none">
-                  CHECK
+                <div
+                  className="absolute top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full pointer-events-none animate-pulse"
+                  style={{
+                    background: 'rgba(239,68,68,0.90)',
+                    color: '#fff',
+                    boxShadow: '0 0 16px rgba(239,68,68,0.6), 0 2px 8px rgba(0,0,0,0.4)',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  ⚠ CHECK
                 </div>
               )}
             </div>
+
+            {/* Opening name badge */}
+            {openingName && !gameState.isGameOver && (
+              <div
+                className="text-[10px] px-2.5 py-1 rounded-lg font-medium truncate text-center"
+                style={{
+                  background: 'rgba(99,102,241,0.08)',
+                  border: '1px solid rgba(99,102,241,0.18)',
+                  color: 'var(--accent-indigo)',
+                }}
+                title={openingName}
+              >
+                📖 {openingName}
+              </div>
+            )}
 
             <PlayerInfo
               name={flipped ? playerNames.black : playerNames.white}
@@ -495,15 +518,17 @@ export default function App() {
               <span style={{ color: 'var(--border-muted)' }}>·</span>
               <span>← → navigate · F flip · ? help</span>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="font-medium" style={{ color: 'var(--text-muted)' }}>{phaseLabel(gamePhase)}</span>
-              <button
-                onClick={copyFEN}
-                className="transition-colors font-mono hover:text-white"
-                title="Copy FEN to clipboard"
+            <div className="flex items-center gap-2">
+              <span
+                className="text-[10px] px-2 py-0.5 rounded-md font-medium"
+                style={{
+                  background: 'var(--bg-overlay)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-muted)',
+                }}
               >
-                Copy FEN
-              </button>
+                {phaseLabel(gamePhase)}
+              </span>
             </div>
           </div>
         </div>
