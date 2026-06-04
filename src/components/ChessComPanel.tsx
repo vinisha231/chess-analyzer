@@ -20,11 +20,19 @@ type Filter = typeof TIME_CLASS_FILTERS[number]
 const RESULT_FILTERS = ['all', 'win', 'loss', 'draw'] as const
 type ResultFilter = typeof RESULT_FILTERS[number]
 
-const RESULT_FILTER_STYLE: Record<ResultFilter, string> = {
-  all:  'bg-gray-700 text-gray-400 hover:text-white',
-  win:  'bg-green-900/50 text-green-400 hover:text-green-300',
-  loss: 'bg-red-900/50 text-red-400 hover:text-red-300',
-  draw: 'bg-gray-700 text-gray-400 hover:text-white',
+const RESULT_ACTIVE: Record<ResultFilter, React.CSSProperties> = {
+  all:  { background: 'var(--accent-indigo)', color: '#fff' },
+  win:  { background: 'rgba(34,197,94,0.2)',  color: '#4ade80', border: '1px solid rgba(34,197,94,0.35)' },
+  loss: { background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' },
+  draw: { background: 'var(--bg-overlay)',    color: 'var(--text-secondary)', border: '1px solid var(--border-muted)' },
+}
+
+const RESULT_LABEL: Record<ResultFilter, string> = {
+  all: 'All', win: '✓ Won', loss: '✗ Lost', draw: '= Draw',
+}
+
+const TIME_LABEL: Record<string, string> = {
+  all: 'All', bullet: '⚡ Bullet', blitz: '🔥 Blitz', rapid: '⏱ Rapid', daily: '📅 Daily',
 }
 
 export default function ChessComPanel({
@@ -51,11 +59,11 @@ export default function ChessComPanel({
     : timeFiltered.filter(g => profile && getResultForPlayer(g, profile.username) === resultFilter)
   const filteredGames = opponentSearch.trim()
     ? resultFiltered.filter(g => {
-        const query = opponentSearch.toLowerCase()
+        const q = opponentSearch.toLowerCase()
         const opp = profile
           ? (g.white.username.toLowerCase() === profile.username.toLowerCase() ? g.black : g.white)
           : g.black
-        return opp.username.toLowerCase().includes(query)
+        return opp.username.toLowerCase().includes(q)
       })
     : resultFiltered
 
@@ -74,6 +82,7 @@ export default function ChessComPanel({
 
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
+      {/* Profile header */}
       <ChessComConnect
         connectionState={connectionState}
         profile={profile}
@@ -83,25 +92,43 @@ export default function ChessComPanel({
         onDisconnect={disconnect}
       />
 
-      <div className="flex gap-1 bg-gray-900/60 rounded-lg p-1 shrink-0">
-        <button
-          onClick={() => setSubTab('games')}
-          className={`flex-1 py-1 rounded-md text-xs font-medium transition-colors ${subTab === 'games' ? 'bg-gray-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          📋 Games
-        </button>
-        <button
-          onClick={() => setSubTab('tips')}
-          className={`flex-1 py-1 rounded-md text-xs font-medium transition-colors ${subTab === 'tips' ? 'bg-gray-600 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          💡 Tips
-        </button>
+      {/* Sub-tab bar */}
+      <div
+        className="flex gap-1 p-1 rounded-xl shrink-0"
+        style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border-subtle)' }}
+      >
+        {([
+          { id: 'games', label: '📋 Games' },
+          { id: 'tips',  label: '💡 Tips'  },
+        ] as const).map(t => (
+          <button
+            key={t.id}
+            onClick={() => setSubTab(t.id)}
+            className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={subTab === t.id ? {
+              background: 'var(--accent-indigo)',
+              color: '#fff',
+              boxShadow: '0 0 8px rgba(99,102,241,0.3)',
+            } : {
+              color: 'var(--text-muted)',
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {subTab === 'tips' && <div className="overflow-y-auto flex-1"><ImprovementTips games={games} username={profile!.username} /></div>}
+      {/* Tips tab */}
+      {subTab === 'tips' && (
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <ImprovementTips games={games} username={profile!.username} />
+        </div>
+      )}
 
+      {/* Games tab */}
       {subTab === 'games' && (
         <>
+          {/* Month picker */}
           <div className="shrink-0">
             <MonthPicker
               year={selectedYear}
@@ -110,79 +137,108 @@ export default function ChessComPanel({
             />
           </div>
 
+          {/* Time class filter */}
           <div className="flex gap-1 flex-wrap shrink-0">
             {TIME_CLASS_FILTERS.map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-2 py-0.5 rounded text-xs font-medium transition-colors capitalize ${
-                  filter === f ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'
-                }`}
+                className="px-2 py-0.5 rounded-full text-[11px] font-medium transition-all"
+                style={filter === f ? {
+                  background: 'var(--accent-indigo)',
+                  color: '#fff',
+                  boxShadow: '0 0 6px rgba(99,102,241,0.3)',
+                } : {
+                  background: 'var(--bg-overlay)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-muted)',
+                }}
               >
-                {f}
+                {TIME_LABEL[f]}
               </button>
             ))}
           </div>
 
+          {/* Result filter + game count */}
           <div className="flex gap-1 flex-wrap shrink-0 items-center">
             {RESULT_FILTERS.map(r => (
               <button
                 key={r}
                 onClick={() => setResultFilter(r)}
-                className={`px-2 py-0.5 rounded text-xs font-medium transition-colors capitalize ${
-                  resultFilter === r
-                    ? r === 'win' ? 'bg-green-700 text-white'
-                      : r === 'loss' ? 'bg-red-700 text-white'
-                      : 'bg-gray-600 text-white'
-                    : RESULT_FILTER_STYLE[r]
-                }`}
+                className="px-2 py-0.5 rounded-full text-[11px] font-medium transition-all"
+                style={resultFilter === r ? RESULT_ACTIVE[r] : {
+                  background: 'var(--bg-overlay)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-muted)',
+                }}
               >
-                {r === 'all' ? 'All results' : r === 'win' ? '✓ Won' : r === 'loss' ? '✗ Lost' : '= Draw'}
+                {RESULT_LABEL[r]}
               </button>
             ))}
             {games.length > 0 && (
-              <span className="ml-auto text-xs text-gray-500 self-center">
-                {filteredGames.length} games
+              <span
+                className="ml-auto text-[10px] font-mono"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {filteredGames.length} / {games.length}
               </span>
             )}
           </div>
 
+          {/* Opponent search */}
           <div className="shrink-0 relative">
             <input
               type="text"
               placeholder="Search by opponent…"
               value={opponentSearch}
               onChange={e => setOpponentSearch(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500 pr-7"
+              className="w-full px-3 py-2 rounded-xl text-xs outline-none transition-all"
+              style={{
+                background: 'var(--bg-overlay)',
+                border: '1px solid var(--border-muted)',
+                color: 'var(--text-primary)',
+              }}
+              onFocus={e => (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-accent)'}
+              onBlur={e => (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-muted)'}
             />
             {opponentSearch && (
               <button
                 onClick={() => setOpponentSearch('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-base leading-none"
-              >
-                ×
-              </button>
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-base leading-none transition-all"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'}
+                onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'}
+              >×</button>
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto min-h-0">
+          {/* Games list */}
+          <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-1.5">
             {gamesLoading && (
-              <div className="flex items-center justify-center py-8 gap-2">
-                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs text-gray-400">Loading games…</span>
+              <div className="flex flex-col items-center justify-center py-10 gap-3">
+                <div
+                  className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"
+                  style={{ borderColor: 'var(--accent-indigo)', borderTopColor: 'transparent' }}
+                />
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Loading games…</span>
               </div>
             )}
             {!gamesLoading && filteredGames.length === 0 && (
-              <p className="text-gray-500 text-xs text-center py-6">
-                {games.length === 0 ? 'No standard chess games this month' : 'No games match this filter'}
-              </p>
+              <div className="flex flex-col items-center py-8 gap-2">
+                <span className="text-2xl opacity-20">♟</span>
+                <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+                  {games.length === 0
+                    ? 'No standard chess games this month'
+                    : 'No games match this filter'}
+                </p>
+              </div>
             )}
             {!gamesLoading && filteredGames.map((game, i) => (
               <GameImportCard
                 key={game.url ?? i}
                 game={game}
                 username={profile!.username}
-                onImport={pgn => { onImportGame(pgn) }}
+                onImport={pgn => onImportGame(pgn)}
               />
             ))}
           </div>
