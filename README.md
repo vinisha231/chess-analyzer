@@ -53,4 +53,4 @@ npm run build
 
 ## How Analysis Works
 
-The app initializes a Stockfish 18 Web Worker on startup. After every move, it sends the current position via the UCI protocol and receives centipawn evaluations and best move lines. The engine runs at configurable depth (8–24 half-moves) with up to 5 simultaneous analysis lines.
+The app initializes a Stockfish 18 Web Worker on startup. After every move, it sends the current position via the UCI protocol and receives centipawn evaluations and best move lines. The engine runs at configurable depth (8–24 half-moves) with up to 5 simultaneous analysis lines. 
