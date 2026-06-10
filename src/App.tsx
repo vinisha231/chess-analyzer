@@ -759,6 +759,7 @@ export default function App() {
           settings={settings}
           onChange={setSettings}
           onClose={() => setShowSettings(false)}
+          onResetDefaults={() => { setSettings(DEFAULT_SETTINGS); setToast('Settings restored to defaults') }}
         />
       )}
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}

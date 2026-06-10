@@ -5,6 +5,7 @@ interface Props {
   settings: GameSettings
   onChange: (settings: GameSettings) => void
   onClose: () => void
+  onResetDefaults?: () => void
 }
 
 function Toggle({ label, value, onChange, description }: {
@@ -56,7 +57,7 @@ function Section({ title }: { title: string }) {
   )
 }
 
-export default function SettingsPanel({ settings, onChange, onClose }: Props) {
+export default function SettingsPanel({ settings, onChange, onClose, onResetDefaults }: Props) {
   const update = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) =>
     onChange({ ...settings, [key]: value })
 
@@ -213,9 +214,23 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
 
         {/* Footer */}
         <div
-          className="px-5 py-4"
+          className="px-5 py-4 flex gap-2"
           style={{ borderTop: '1px solid var(--border-subtle)' }}
         >
+          {onResetDefaults && (
+            <button
+              onClick={onResetDefaults}
+              className="px-4 py-2.5 rounded-xl font-semibold text-sm transition-all"
+              style={{
+                background: 'var(--bg-overlay)',
+                border: '1px solid var(--border-muted)',
+                color: 'var(--text-secondary)',
+              }}
+              title="Restore all settings to their defaults"
+            >
+              Reset
+            </button>
+          )}
           <button
             onClick={onClose}
             className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all"
