@@ -20,6 +20,8 @@ export default function MoveNavigator({ current, total, onJump }: Props) {
         onChange={e => onJump(parseInt(e.target.value))}
         className="w-full cursor-pointer"
         title={current >= 0 ? `Move ${moveNum}` : 'Start position'}
+        aria-label="Game position scrubber"
+        aria-valuetext={current >= 0 ? `Move ${moveNum} of ${Math.floor((total - 1) / 2) + 1}` : 'Start position'}
       />
       <div className="flex items-center justify-between">
         <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>Start</span>
