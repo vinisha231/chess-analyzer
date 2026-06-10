@@ -11,7 +11,7 @@ function loadProgress(): Record<string, OpeningProgress> {
 }
 
 function saveProgress(data: Record<string, OpeningProgress>) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch { /* storage unavailable */ }
 }
 
 export function useOpeningProgress() {
