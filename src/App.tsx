@@ -339,6 +339,8 @@ export default function App() {
       if (e.key === 'f' || e.key === 'F') setFlipped(f => !f)
       if (e.key === '?') setShowShortcuts(s => !s)
       if (e.key === ' ') { e.preventDefault(); setAutoplay(a => !a) }
+      if (e.key === 'n' || e.key === 'N') handleReset()
+      if (e.key === 'c' || e.key === 'C') copyFEN()
       if (e.key === 'Home' && canGoPrev) goToMove(0)
       if (e.key === 'End' && canGoNext) goToMove(gameState.moveHistory.length - 1)
     }
