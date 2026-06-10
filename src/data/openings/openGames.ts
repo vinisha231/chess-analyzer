@@ -54,7 +54,7 @@ export const openGames: ChessOpening[] = [
     difficulty: 'intermediate',
     description: 'Named after 16th-century Spanish priest Ruy López de Segura, this opening is the most deeply analyzed in chess history. White immediately puts pressure on the knight defending e5, planning to win the center.',
     moves: [
-      { uci: 'e2e4', san: 'e4',  explanation: 'Open the position — White's most popular first move at all levels.' },
+      { uci: 'e2e4', san: 'e4',  explanation: 'Open the position — White\'s most popular first move at all levels.' },
       { uci: 'e7e5', san: 'e5',  explanation: 'The symmetric response, contesting the center.' },
       { uci: 'g1f3', san: 'Nf3', explanation: 'Attack the e5 pawn and develop the knight.' },
       { uci: 'b8c6', san: 'Nc6', explanation: 'Defend the e5 pawn naturally.' },
