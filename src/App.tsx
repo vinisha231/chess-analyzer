@@ -197,7 +197,7 @@ export default function App() {
   function onSquareClick(square: string) {
     if (gameState.isGameOver) return
     if (selectedSquare && selectedSquare !== square) {
-      if (isPromotionMove(selectedSquare, square)) {
+      if (isPromotionMove(selectedSquare, square) && !settings.autoQueen) {
         setPendingPromotion({ from: selectedSquare, to: square })
         setSelectedSquare(null)
         return
@@ -216,7 +216,7 @@ export default function App() {
 
   function onPieceDrop(from: string, to: string | null): boolean {
     if (gameState.isGameOver || !to) return false
-    if (isPromotionMove(from, to)) {
+    if (isPromotionMove(from, to) && !settings.autoQueen) {
       setPendingPromotion({ from, to })
       return true
     }
