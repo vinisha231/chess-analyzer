@@ -40,6 +40,10 @@ export const SoundEngine = {
     setTimeout(() => playTone(1047, 0.15, 'triangle', 0.12), 220)
   },
   illegal() { playTone(220, 0.15, 'sawtooth', 0.08) },
+  gameStart() {
+    playTone(523, 0.1, 'triangle', 0.1)
+    setTimeout(() => playTone(659, 0.15, 'triangle', 0.1), 120)
+  },
   gameEnd() {
     playTone(523, 0.2)
     setTimeout(() => playTone(659, 0.2), 200)

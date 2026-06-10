@@ -310,6 +310,7 @@ export default function App() {
 
   function handleReset() {
     resetGame()
+    if (settings.soundEnabled) SoundEngine.gameStart()
     timer.reset()
     setShowResultModal(false)
     setSelectedSquare(null)
