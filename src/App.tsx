@@ -232,8 +232,10 @@ export default function App() {
     return (piece.color === 'w' && toRank === '8') || (piece.color === 'b' && toRank === '1')
   }
 
+  const isBotTurn = gameMode === 'bot' && gameState.turn === botColor
+
   function onSquareClick(square: string) {
-    if (gameState.isGameOver) return
+    if (gameState.isGameOver || isBotTurn) return
     if (selectedSquare && selectedSquare !== square) {
       if (isPromotionMove(selectedSquare, square) && !settings.autoQueen) {
         setPendingPromotion({ from: selectedSquare, to: square })
@@ -253,7 +255,7 @@ export default function App() {
   }
 
   function onPieceDrop(from: string, to: string | null): boolean {
-    if (gameState.isGameOver || !to) return false
+    if (gameState.isGameOver || isBotTurn || !to) return false
     if (isPromotionMove(from, to) && !settings.autoQueen) {
       setPendingPromotion({ from, to })
       return true
@@ -355,7 +357,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           {/* Mode toggle */}
           <div className="flex p-0.5 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
-            {(['pvp', 'analysis'] as const).map(mode => (
+            {(['pvp', 'bot', 'analysis'] as const).map(mode => (
               <button key={mode}
                 onClick={() => setGameMode(mode)}
                 className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
@@ -365,7 +367,7 @@ export default function App() {
                   boxShadow: '0 0 12px rgba(99,102,241,0.35)',
                 } : { color: 'var(--text-muted)' }}
               >
-                {mode === 'pvp' ? 'vs Player' : 'Analysis'}
+                {mode === 'pvp' ? 'vs Player' : mode === 'bot' ? 'vs Computer' : 'Analysis'}
               </button>
             ))}
           </div>
