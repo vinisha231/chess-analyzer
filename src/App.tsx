@@ -58,7 +58,16 @@ export default function App() {
   const [flipped, setFlipped] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showPGN, setShowPGN] = useState(false)
-  const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats' | 'chesscom' | 'openings'>('analysis')
+  type Tab = 'analysis' | 'history' | 'stats' | 'chesscom' | 'openings'
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const saved = localStorage.getItem('chess-active-tab')
+    return (['analysis', 'history', 'stats', 'chesscom', 'openings'] as const).includes(saved as Tab)
+      ? (saved as Tab) : 'analysis'
+  })
+
+  useEffect(() => {
+    localStorage.setItem('chess-active-tab', activeTab)
+  }, [activeTab])
   const [playerNames, setPlayerNames] = useState(() => {
     try {
       const saved = localStorage.getItem('chess-player-names')
