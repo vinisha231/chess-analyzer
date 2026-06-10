@@ -45,6 +45,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   timeControl: 300,
   autoAnalysis: true,
   showMaterialBar: true,
+  autoQueen: false,
 }
 
 export default function App() {

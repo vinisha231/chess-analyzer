@@ -67,6 +67,7 @@ export interface GameSettings {
   timeControl: number
   autoAnalysis: boolean
   showMaterialBar: boolean
+  autoQueen: boolean
 }
 
 export interface CapturedPieces {
