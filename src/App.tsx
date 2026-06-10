@@ -217,7 +217,8 @@ export default function App() {
   }
 
   const bestMoveArrows = useCallback(() => {
-    if (!settings.showBestMoveArrow) return []
+    // No engine hints while actively playing against the bot
+    if (!settings.showBestMoveArrow || (gameMode === 'bot' && !gameState.isGameOver)) return []
     const arrowColors = [
       'rgba(99,102,241,0.80)',   // indigo — best move
       'rgba(34,197,94,0.55)',    // green — 2nd best
@@ -231,7 +232,7 @@ export default function App() {
         endSquare: line.moves[0].slice(2, 4),
         color: arrowColors[i],
       }))
-  }, [sfResult.lines, settings.showBestMoveArrow])
+  }, [sfResult.lines, settings.showBestMoveArrow, gameMode, gameState.isGameOver])
 
   function isPromotionMove(from: string, to: string): boolean {
     const piece = game.chess.current.get(from as any)
