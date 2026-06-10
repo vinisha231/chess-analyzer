@@ -134,6 +134,26 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameMode, gameState.fen, gameState.turn, gameState.isGameOver, botColor])
 
+  // Allow dropping a .pgn file anywhere on the page to import it
+  useEffect(() => {
+    const onDragOver = (e: DragEvent) => e.preventDefault()
+    const onDrop = (e: DragEvent) => {
+      e.preventDefault()
+      const file = e.dataTransfer?.files?.[0]
+      if (!file || !/\.(pgn|txt)$/i.test(file.name)) return
+      file.text().then(text => {
+        if (loadFromPGN(text.trim())) setToast(`Imported ${file.name}`)
+        else setToast({ message: `Could not parse ${file.name}`, variant: 'error' })
+      })
+    }
+    window.addEventListener('dragover', onDragOver)
+    window.addEventListener('drop', onDrop)
+    return () => {
+      window.removeEventListener('dragover', onDragOver)
+      window.removeEventListener('drop', onDrop)
+    }
+  }, [loadFromPGN])
+
   // Load a shared position from the URL hash on first mount
   useEffect(() => {
     const sharedFen = readSharedFen()
