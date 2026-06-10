@@ -95,6 +95,8 @@ export default function App() {
     if (!settings.soundEnabled) return
     const lastMove = gameState.moveHistory[gameState.moveHistory.length - 1]
     if (gameState.isCheck) SoundEngine.check()
+    else if (lastMove?.san.includes('=')) SoundEngine.promote()
+    else if (lastMove?.san.startsWith('O-O')) SoundEngine.castle()
     else if (lastMove?.san.includes('x')) SoundEngine.capture()
     else SoundEngine.move()
   }, [gameState.moveHistory.length])
