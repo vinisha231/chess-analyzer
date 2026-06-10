@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { downloadPGN, parseFEN } from '../utils/pgn'
 
 interface Props {
@@ -20,6 +20,17 @@ export default function PGNPanel({ pgn, onImportPGN, onImportFEN, onClose }: Pro
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [copied, setCopied] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileUpload = (file: File) => {
+    setError('')
+    setSuccess('')
+    file.text().then(text => {
+      const ok = onImportPGN(text.trim())
+      if (!ok) setError(`Could not parse ${file.name} as PGN`)
+      else setSuccess(`Loaded ${file.name}`)
+    }).catch(() => setError('Could not read the file'))
+  }
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(pgn).then(() => {
@@ -163,6 +174,28 @@ export default function PGNPanel({ pgn, onImportPGN, onImportFEN, onClose }: Pro
 
           {(tab === 'pgn' || tab === 'fen') && (
             <div className="flex flex-col gap-3">
+              {tab === 'pgn' && (
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pgn,.txt"
+                    className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = '' }}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full py-2 rounded-xl text-xs font-semibold transition-all border-dashed"
+                    style={{
+                      background: 'var(--bg-overlay)',
+                      border: '1px dashed var(--border-muted)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    📂 Upload a .pgn file
+                  </button>
+                </>
+              )}
               <textarea
                 value={importText}
                 onChange={e => setImportText(e.target.value)}
