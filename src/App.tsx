@@ -282,6 +282,22 @@ export default function App() {
     navigator.clipboard.writeText(gameState.fen).then(() => setToast('FEN copied to clipboard'))
   }
 
+  function copyShareLink() {
+    navigator.clipboard.writeText(buildShareUrl(gameState.fen)).then(() => setToast('Share link copied'))
+  }
+
+  function copyPGN() {
+    if (!gameState.pgn) { setToast('No moves to copy yet'); return }
+    navigator.clipboard.writeText(gameState.pgn).then(() => setToast('PGN copied to clipboard'))
+  }
+
+  function exportPGN() {
+    if (!gameState.pgn) { setToast('No moves to export yet'); return }
+    const date = new Date().toISOString().slice(0, 10)
+    downloadPGN(gameState.pgn, `chess-analyzer-${date}.pgn`)
+    setToast('PGN downloaded')
+  }
+
   return (
     <div className="min-h-screen text-white flex flex-col" style={{ background: 'var(--bg-base)' }}>
       {/* Header */}
@@ -553,6 +569,21 @@ export default function App() {
               <span>← → navigate · F flip · ? help</span>
             </div>
             <div className="flex items-center gap-2">
+              {(['Share', 'Copy PGN', 'Save PGN'] as const).map(action => (
+                <button
+                  key={action}
+                  onClick={action === 'Share' ? copyShareLink : action === 'Copy PGN' ? copyPGN : exportPGN}
+                  className="text-[10px] px-2 py-0.5 rounded-md font-medium transition-colors hover:text-white"
+                  style={{
+                    background: 'var(--bg-overlay)',
+                    border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-secondary)',
+                  }}
+                  title={action === 'Share' ? 'Copy a link to this position' : action === 'Copy PGN' ? 'Copy game PGN to clipboard' : 'Download game as .pgn file'}
+                >
+                  {action === 'Share' ? '🔗 Share' : action === 'Copy PGN' ? '📋 PGN' : '💾 Save'}
+                </button>
+              ))}
               <span
                 className="text-[10px] px-2 py-0.5 rounded-md font-medium"
                 style={{
