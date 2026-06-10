@@ -168,6 +168,14 @@ export default function App() {
   const openingName = getOpeningName(gameState.fen)
   const material = game.getMaterialCount()
 
+  // In bot mode, label the engine's side with its difficulty name
+  const displayNames = gameMode === 'bot'
+    ? {
+        white: botColor === 'w' ? `🤖 ${BOT_LEVELS[botLevel].label} Bot` : playerNames.white,
+        black: botColor === 'b' ? `🤖 ${BOT_LEVELS[botLevel].label} Bot` : playerNames.black,
+      }
+    : playerNames
+
   const legalSquareStyles = useCallback((): Record<string, object> => {
     if (!selectedSquare || !settings.showLegalMoves) return {}
     const legalMoves = game.getLegalMoves(selectedSquare)
@@ -406,7 +414,7 @@ export default function App() {
 
           <div className="flex flex-col gap-2">
             <PlayerInfo
-              name={flipped ? playerNames.white : playerNames.black}
+              name={flipped ? displayNames.white : displayNames.black}
               color={flipped ? 'w' : 'b'}
               isActive={gameState.turn === (flipped ? 'w' : 'b') && !gameState.isGameOver}
               capturedPieces={capturedPieces}
@@ -496,7 +504,7 @@ export default function App() {
             )}
 
             <PlayerInfo
-              name={flipped ? playerNames.black : playerNames.white}
+              name={flipped ? displayNames.black : displayNames.white}
               color={flipped ? 'b' : 'w'}
               isActive={gameState.turn === (flipped ? 'b' : 'w') && !gameState.isGameOver}
               capturedPieces={capturedPieces}
