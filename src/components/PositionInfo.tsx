@@ -49,6 +49,7 @@ export default function PositionInfo({ fen, moveCount, onCopyFen }: Props) {
     (c.blackQueenside ? 'q' : '—')
 
   const lichessUrl = `https://lichess.org/analysis/${encodeURIComponent(fen)}`
+  const chessComUrl = `https://www.chess.com/analysis?fen=${encodeURIComponent(fen)}`
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -105,6 +106,29 @@ export default function PositionInfo({ fen, moveCount, onCopyFen }: Props) {
           title="Analyze this position on Lichess"
         >
           Lichess ↗
+        </a>
+        <a
+          href={chessComUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="flex-1 text-[10px] px-2 py-1 rounded-lg font-medium transition-all text-center"
+          style={{
+            background: 'var(--bg-overlay)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(129,182,76,0.35)'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = '#81b64c'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border-subtle)'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-muted)'
+          }}
+          title="Analyze this position on chess.com"
+        >
+          chess.com ↗
         </a>
       </div>
     </div>
