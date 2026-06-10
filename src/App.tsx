@@ -24,6 +24,7 @@ import Toast from './components/Toast'
 import OpeningsPanel from './components/openings/OpeningsPanel'
 import EvalChart from './components/EvalChart'
 import { useChessCom } from './hooks/useChessCom'
+import { useEngineOpponent, BOT_LEVELS, type BotLevel } from './hooks/useEngineOpponent'
 import type { ChessComGame } from './utils/chesscomApi'
 import type { GameSettings } from './types'
 import { getOpeningName } from './utils/openings'
@@ -81,7 +82,12 @@ export default function App() {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
   const [showResultModal, setShowResultModal] = useState(false)
   const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null)
-  const [gameMode, setGameMode] = useState<'pvp' | 'analysis'>('pvp')
+  const [gameMode, setGameMode] = useState<'pvp' | 'bot' | 'analysis'>('pvp')
+  const [botLevel, setBotLevel] = useState<BotLevel>(() => {
+    const saved = Number(localStorage.getItem('chess-bot-level'))
+    return (saved >= 1 && saved <= 5 ? saved : 3) as BotLevel
+  })
+  const [botColor, setBotColor] = useState<'w' | 'b'>('b')
   const [reviewingGame, setReviewingGame] = useState<ChessComGame | null>(null)
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -92,6 +98,7 @@ export default function App() {
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
   const timer = useTimer(settings.timeControl, settings.enableTimer)
   const chessCom = useChessCom()
+  const bot = useEngineOpponent(botLevel)
 
   const { gameState, capturedPieces, makeMove, undoMove, resetGame, goToMove, loadFromFEN, loadFromPGN } = game
 
@@ -102,6 +109,23 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('chess-player-names', JSON.stringify(playerNames))
   }, [playerNames])
+
+  useEffect(() => {
+    localStorage.setItem('chess-bot-level', String(botLevel))
+  }, [botLevel])
+
+  // Bot mode: when it's the engine's turn, ask Stockfish for a reply
+  useEffect(() => {
+    if (gameMode !== 'bot' || gameState.isGameOver || gameState.turn !== botColor) return
+    if (gameState.currentMoveIndex !== gameState.moveHistory.length - 1) return
+    let cancelled = false
+    bot.requestMove(gameState.fen).then(uci => {
+      if (cancelled || !uci || uci.length < 4) return
+      makeMove(uci.slice(0, 2), uci.slice(2, 4), (uci[4] as 'q' | 'r' | 'b' | 'n') ?? 'q')
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameMode, gameState.fen, gameState.turn, gameState.isGameOver, botColor])
 
   // Load a shared position from the URL hash on first mount
   useEffect(() => {
