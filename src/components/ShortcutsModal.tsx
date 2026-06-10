@@ -9,6 +9,8 @@ const SHORTCUTS = [
   { section: null, keys: ['Home', 'End'], description: 'Jump to first / last move' },
   { section: null, keys: ['Space'], description: 'Toggle autoplay replay' },
   { section: null, keys: ['F'], description: 'Flip the board' },
+  { section: null, keys: ['N'], description: 'Start a new game' },
+  { section: null, keys: ['C'], description: 'Copy current FEN' },
   { section: null, keys: ['?'], description: 'Open this shortcuts dialog' },
   { section: 'Opening Lesson', keys: ['←', '→'], description: 'Step through opening moves' },
   { section: null, keys: ['↑'], description: 'Go to start of opening' },
