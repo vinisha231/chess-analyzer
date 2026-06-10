@@ -6,6 +6,8 @@ const SHORTCUTS = [
   { section: 'Main Board', keys: ['←', '→'], description: 'Navigate moves backward / forward' },
   { section: null, keys: ['↑'], description: 'Jump to the first move' },
   { section: null, keys: ['↓'], description: 'Jump to the last move' },
+  { section: null, keys: ['Home', 'End'], description: 'Jump to first / last move' },
+  { section: null, keys: ['Space'], description: 'Toggle autoplay replay' },
   { section: null, keys: ['F'], description: 'Flip the board' },
   { section: null, keys: ['?'], description: 'Open this shortcuts dialog' },
   { section: 'Opening Lesson', keys: ['←', '→'], description: 'Step through opening moves' },
