@@ -4,11 +4,11 @@ export type BotLevel = 1 | 2 | 3 | 4 | 5
 
 /** Maps a friendly bot level to Stockfish skill + search limits. */
 export const BOT_LEVELS: Record<BotLevel, { label: string; skill: number; depth: number; movetime: number; elo: string }> = {
-  1: { label: 'Beginner',     skill: 1,  depth: 4,  movetime: 300,  elo: '~800' },
-  2: { label: 'Casual',       skill: 5,  depth: 6,  movetime: 500,  elo: '~1200' },
-  3: { label: 'Intermediate', skill: 10, depth: 10, movetime: 800,  elo: '~1600' },
-  4: { label: 'Advanced',     skill: 15, depth: 14, movetime: 1200, elo: '~2000' },
-  5: { label: 'Master',       skill: 20, depth: 18, movetime: 2000, elo: '~2400+' },
+  1: { label: 'Beginner',     skill: 1,  depth: 2,  movetime: 120, elo: '~800' },
+  2: { label: 'Casual',       skill: 5,  depth: 4,  movetime: 200, elo: '~1200' },
+  3: { label: 'Intermediate', skill: 10, depth: 8,  movetime: 350, elo: '~1600' },
+  4: { label: 'Advanced',     skill: 15, depth: 12, movetime: 600, elo: '~2000' },
+  5: { label: 'Master',       skill: 20, depth: 16, movetime: 900, elo: '~2400+' },
 }
 
 /**
