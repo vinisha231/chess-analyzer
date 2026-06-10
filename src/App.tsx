@@ -90,7 +90,7 @@ export default function App() {
   const [botColor, setBotColor] = useState<'w' | 'b'>('b')
   const [reviewingGame, setReviewingGame] = useState<ChessComGame | null>(null)
   const [showShortcuts, setShowShortcuts] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; variant?: 'success' | 'info' | 'error' } | string | null>(null)
   const [autoplay, setAutoplay] = useState(false)
   const [autoplaySpeed, setAutoplaySpeed] = useState(1000)
   const [boardWidth, setBoardWidth] = useState(() => Math.min(520, window.innerWidth - 56))
@@ -344,12 +344,12 @@ export default function App() {
   }
 
   function copyPGN() {
-    if (!gameState.pgn) { setToast('No moves to copy yet'); return }
+    if (!gameState.pgn) { setToast({ message: 'No moves to copy yet', variant: 'error' }); return }
     navigator.clipboard.writeText(gameState.pgn).then(() => setToast('PGN copied to clipboard'))
   }
 
   function exportPGN() {
-    if (!gameState.pgn) { setToast('No moves to export yet'); return }
+    if (!gameState.pgn) { setToast({ message: 'No moves to export yet', variant: 'error' }); return }
     const date = new Date().toISOString().slice(0, 10)
     downloadPGN(gameState.pgn, `chess-analyzer-${date}.pgn`)
     setToast('PGN downloaded')
@@ -737,7 +737,13 @@ export default function App() {
         />
       )}
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {toast && (
+        <Toast
+          message={typeof toast === 'string' ? toast : toast.message}
+          variant={typeof toast === 'string' ? 'success' : toast.variant}
+          onDone={() => setToast(null)}
+        />
+      )}
       {showPGN && (
         <PGNPanel
           pgn={gameState.pgn}
