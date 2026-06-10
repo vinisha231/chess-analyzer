@@ -579,6 +579,8 @@ export default function App() {
             ] as const).map(([tab, icon, label]) => (
               <button
                 key={tab}
+                role="tab"
+                aria-selected={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
                 className="flex-1 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center justify-center gap-1"
                 style={activeTab === tab ? {
