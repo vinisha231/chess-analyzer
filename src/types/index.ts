@@ -1,7 +1,7 @@
 export type PieceColor = 'w' | 'b'
 export type GameMode = 'pvp' | 'analysis'
 export type ThemeMode = 'dark' | 'light'
-export type BoardTheme = 'classic' | 'ocean' | 'forest' | 'walnut' | 'rose' | 'midnight' | 'coral'
+export type BoardTheme = 'classic' | 'ocean' | 'forest' | 'walnut' | 'rose' | 'midnight' | 'coral' | 'ice' | 'lavender' | 'slate' | 'sand'
 
 export interface MoveClassification {
   label: 'brilliant' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' | 'miss'

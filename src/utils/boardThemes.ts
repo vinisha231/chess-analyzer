@@ -8,6 +8,10 @@ export const BOARD_THEMES: Record<BoardTheme, { dark: string; light: string; lab
   rose:     { dark: '#8b5a6b', light: '#f5d0d8', label: 'Rose' },
   midnight: { dark: '#1e2a4a', light: '#8899bb', label: 'Midnight' },
   coral:    { dark: '#c04848', light: '#f5c9b3', label: 'Coral' },
+  ice:      { dark: '#5a7d9a', light: '#e8f1f8', label: 'Ice' },
+  lavender: { dark: '#7c6b9e', light: '#ece5f7', label: 'Lavender' },
+  slate:    { dark: '#52525b', light: '#d4d4d8', label: 'Slate' },
+  sand:     { dark: '#a98865', light: '#f6ead8', label: 'Sand' },
 }
 
 export function getBoardColors(theme: BoardTheme) {
