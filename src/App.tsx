@@ -202,6 +202,7 @@ export default function App() {
       return true
     }
     const ok = makeMove(from, to, 'q')
+    if (!ok && settings.soundEnabled) SoundEngine.illegal()
     setSelectedSquare(null)
     return ok
   }
