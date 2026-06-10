@@ -85,6 +85,8 @@ export default function App() {
   const [reviewingGame, setReviewingGame] = useState<ChessComGame | null>(null)
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [autoplay, setAutoplay] = useState(false)
+  const [autoplaySpeed, setAutoplaySpeed] = useState(1000)
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -255,6 +257,16 @@ export default function App() {
   const canGoPrev = gameState.currentMoveIndex >= 0
   const canGoNext = gameState.currentMoveIndex < gameState.moveHistory.length - 1
 
+  // Autoplay: step forward through the move list on a timer
+  useEffect(() => {
+    if (!autoplay) return
+    if (!canGoNext) { setAutoplay(false); return }
+    const id = setInterval(() => {
+      goToMove(gameState.currentMoveIndex + 1)
+    }, autoplaySpeed)
+    return () => clearInterval(id)
+  }, [autoplay, canGoNext, gameState.currentMoveIndex, autoplaySpeed, goToMove])
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
@@ -264,6 +276,9 @@ export default function App() {
       if (e.key === 'ArrowDown') goToMove(gameState.moveHistory.length - 1)
       if (e.key === 'f' || e.key === 'F') setFlipped(f => !f)
       if (e.key === '?') setShowShortcuts(s => !s)
+      if (e.key === ' ') { e.preventDefault(); setAutoplay(a => !a) }
+      if (e.key === 'Home' && canGoPrev) goToMove(0)
+      if (e.key === 'End' && canGoNext) goToMove(gameState.moveHistory.length - 1)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
