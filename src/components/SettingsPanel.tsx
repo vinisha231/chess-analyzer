@@ -186,6 +186,7 @@ export default function SettingsPanel({ settings, onChange, onClose }: Props) {
           <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
             <Toggle label="Sound effects" value={settings.soundEnabled} onChange={v => update('soundEnabled', v)} />
             <Toggle label="Show material bar" value={settings.showMaterialBar} onChange={v => update('showMaterialBar', v)} />
+            <Toggle label="Always promote to queen" value={settings.autoQueen} onChange={v => update('autoQueen', v)} description="Skip the promotion piece picker" />
             <Toggle label="Game timer" value={settings.enableTimer} onChange={v => update('enableTimer', v)} />
             {settings.enableTimer && (
               <div className="py-2.5">
