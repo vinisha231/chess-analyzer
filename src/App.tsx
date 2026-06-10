@@ -415,6 +415,39 @@ export default function App() {
               timeLow={flipped ? timer.whiteLow : timer.blackLow}
             />
 
+            {gameMode === 'bot' && (
+              <div
+                className="flex items-center gap-2 rounded-xl px-3 py-2"
+                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}
+              >
+                <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: 'var(--text-muted)' }}>Bot</span>
+                <select
+                  value={botLevel}
+                  onChange={e => setBotLevel(Number(e.target.value) as BotLevel)}
+                  className="flex-1 text-xs rounded-lg px-2 py-1 outline-none cursor-pointer"
+                  style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border-muted)', color: 'var(--text-primary)' }}
+                  title="Bot difficulty"
+                >
+                  {(Object.entries(BOT_LEVELS)).map(([lvl, cfg]) => (
+                    <option key={lvl} value={lvl}>{cfg.label} ({cfg.elo})</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => { setBotColor(c => (c === 'w' ? 'b' : 'w')); setFlipped(botColor !== 'w') }}
+                  className="text-xs px-2 py-1 rounded-lg transition-all"
+                  style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border-muted)', color: 'var(--text-secondary)' }}
+                  title="Switch which side the bot plays"
+                >
+                  Bot plays {botColor === 'w' ? '⚪' : '⚫'}
+                </button>
+                {bot.isThinking && (
+                  <span className="text-[10px] animate-pulse font-medium" style={{ color: 'var(--accent-indigo)' }}>
+                    thinking…
+                  </span>
+                )}
+              </div>
+            )}
+
             <div className="relative">
               <Chessboard
                 options={{
