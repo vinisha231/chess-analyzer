@@ -59,7 +59,12 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showPGN, setShowPGN] = useState(false)
   const [activeTab, setActiveTab] = useState<'analysis' | 'history' | 'stats' | 'chesscom' | 'openings'>('analysis')
-  const [playerNames, setPlayerNames] = useState({ white: 'White', black: 'Black' })
+  const [playerNames, setPlayerNames] = useState(() => {
+    try {
+      const saved = localStorage.getItem('chess-player-names')
+      return saved ? JSON.parse(saved) : { white: 'White', black: 'Black' }
+    } catch { return { white: 'White', black: 'Black' } }
+  })
   const [showNameEditor, setShowNameEditor] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
   const [showResultModal, setShowResultModal] = useState(false)
@@ -79,6 +84,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('chess-settings', JSON.stringify(settings))
   }, [settings])
+
+  useEffect(() => {
+    localStorage.setItem('chess-player-names', JSON.stringify(playerNames))
+  }, [playerNames])
 
   useEffect(() => {
     if (gameState.isGameOver) {
