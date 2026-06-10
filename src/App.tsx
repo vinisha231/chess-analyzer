@@ -471,6 +471,8 @@ export default function App() {
               canGoNext={canGoNext}
               onOpenPGN={() => setShowPGN(true)}
               onOpenSettings={() => setShowSettings(true)}
+              autoplay={autoplay}
+              onToggleAutoplay={() => setAutoplay(a => !a)}
             />
           </div>
         </div>

@@ -11,6 +11,8 @@ interface Props {
   canGoNext: boolean
   onOpenPGN: () => void
   onOpenSettings: () => void
+  autoplay?: boolean
+  onToggleAutoplay?: () => void
 }
 
 interface BtnProps {
@@ -58,6 +60,7 @@ export default function GameControls({
   onFirst, onPrev, onNext, onLast,
   canGoPrev, canGoNext,
   onOpenPGN, onOpenSettings,
+  autoplay, onToggleAutoplay,
 }: Props) {
   return (
     <div
@@ -71,6 +74,11 @@ export default function GameControls({
       <Btn title="First move (↑)" onClick={onFirst} disabled={!canGoPrev}>⏮</Btn>
       <Btn title="Previous move (←)" onClick={onPrev} disabled={!canGoPrev}>◀</Btn>
       <Btn title="Next move (→)" onClick={onNext} disabled={!canGoNext}>▶</Btn>
+      {onToggleAutoplay && (
+        <Btn title={autoplay ? 'Pause replay (Space)' : 'Autoplay replay (Space)'} onClick={onToggleAutoplay} disabled={!canGoNext && !autoplay} accent>
+          {autoplay ? '⏸' : '▶▶'}
+        </Btn>
+      )}
       <Btn title="Last move (↓)" onClick={onLast} disabled={!canGoNext}>⏭</Btn>
 
       {/* Divider */}
