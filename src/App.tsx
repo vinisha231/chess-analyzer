@@ -452,6 +452,20 @@ export default function App() {
               total={gameState.moveHistory.length}
               onJump={goToMove}
             />
+            {autoplay && (
+              <button
+                onClick={() => setAutoplaySpeed(s => (s === 2000 ? 1000 : s === 1000 ? 500 : 2000))}
+                className="text-[10px] px-2 py-1 rounded-lg font-medium self-center transition-all"
+                style={{
+                  background: 'rgba(99,102,241,0.10)',
+                  border: '1px solid rgba(99,102,241,0.25)',
+                  color: 'var(--accent-indigo)',
+                }}
+                title="Change autoplay speed"
+              >
+                ▶▶ Replay speed: {autoplaySpeed === 2000 ? '0.5×' : autoplaySpeed === 1000 ? '1×' : '2×'}
+              </button>
+            )}
             <PositionInfo
               fen={gameState.fen}
               moveCount={gameState.moveHistory.length}
