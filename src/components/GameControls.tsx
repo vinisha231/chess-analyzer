@@ -27,6 +27,7 @@ function Btn({ title, onClick, disabled, children, accent }: BtnProps) {
   return (
     <button
       title={title}
+      aria-label={title}
       onClick={onClick}
       disabled={disabled}
       className="relative p-2 rounded-lg transition-all duration-150 disabled:opacity-25 disabled:cursor-not-allowed group"
