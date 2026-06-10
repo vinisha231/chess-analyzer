@@ -170,9 +170,12 @@ export default function App() {
       stop()
       if (settings.soundEnabled) SoundEngine.gameEnd()
     } else if (settings.autoAnalysis) {
+      // Don't burn CPU analyzing positions the bot is about to answer —
+      // both engines would compete for the same thread and slow its reply
+      if (gameMode === 'bot' && gameState.turn === botColor) return
       analyze(gameState.fen)
     }
-  }, [gameState.fen, gameState.isGameOver, settings.autoAnalysis])
+  }, [gameState.fen, gameState.isGameOver, settings.autoAnalysis, gameMode, botColor, gameState.turn])
 
   useEffect(() => {
     if (gameState.moveHistory.length === 0) return
