@@ -13,8 +13,12 @@ A full-featured chess game analyzer built with React, TypeScript, and Stockfish 
 - **Legal move highlighting** with capture differentiation
 - **Last move highlight** with yellow square indicators
 - **Pawn promotion dialog** with piece selector
-- **Game modes**: Player vs Player and Analysis Mode
-- **Board themes**: Classic, Ocean, Forest, Walnut, Rose
+- **Game modes**: Player vs Player, **vs Computer** (5 difficulty levels from ~800 to ~2400+ Elo), and Analysis Mode
+- **Board themes**: 11 themes — Classic, Ocean, Forest, Walnut, Rose, Midnight, Coral, Ice, Lavender, Slate, Sand
+- **Autoplay replay** with adjustable speed (0.5×/1×/2×)
+- **Share positions** via URL — anyone opening the link sees your exact board
+- **Drag-and-drop PGN import** — drop a `.pgn` file anywhere on the page
+- **Sound effects** for moves, captures, castling, promotion, check, and game end
 - **Material balance bar** with advantage counter
 - **Position info**: castling rights, en passant, 50-move rule
 - **Game phase detection**: Opening / Middlegame / Endgame
