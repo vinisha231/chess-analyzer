@@ -29,9 +29,22 @@ A full-featured chess game analyzer built with React, TypeScript, and Stockfish 
 - **Game stats**: accuracy percentages and move classification breakdown
 - **Captured pieces** display with unicode symbols
 - **Player name editor**
-- **Keyboard shortcuts**: arrow keys for navigation, F to flip
+- **Keyboard shortcuts**: see table below
 - **Settings panel**: all features are toggleable
 - **Copy FEN** to clipboard
+
+## Keyboard Shortcuts
+
+| Key | Action |
+| --- | --- |
+| `←` / `→` | Previous / next move |
+| `↑` / `↓` | First / last move |
+| `Home` / `End` | First / last move |
+| `Space` | Toggle autoplay replay |
+| `F` | Flip the board |
+| `N` | New game |
+| `C` | Copy FEN |
+| `?` | Show shortcuts dialog |
 
 ## Tech Stack
 
