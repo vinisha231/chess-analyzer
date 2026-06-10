@@ -389,7 +389,9 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-base font-bold leading-tight tracking-tight">Chess Analyzer</h1>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Stockfish 18 · Engine analysis</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              Stockfish 18 · {gameMode === 'bot' ? `vs ${BOT_LEVELS[botLevel].label} Bot` : gameMode === 'pvp' ? 'Two players' : 'Engine analysis'}
+            </p>
           </div>
         </div>
 
