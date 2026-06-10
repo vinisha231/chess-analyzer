@@ -93,6 +93,13 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null)
   const [autoplay, setAutoplay] = useState(false)
   const [autoplaySpeed, setAutoplaySpeed] = useState(1000)
+  const [boardWidth, setBoardWidth] = useState(() => Math.min(520, window.innerWidth - 56))
+
+  useEffect(() => {
+    const onResize = () => setBoardWidth(Math.min(520, window.innerWidth - 56))
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const game = useChessGame()
   const { result: sfResult, analyze, stop } = useStockfish(settings.analysisDepth, settings.multiPV)
@@ -465,7 +472,7 @@ export default function App() {
                     onPieceDrop(sourceSquare, targetSquare),
                   onSquareClick: ({ square }) => onSquareClick(square),
                   boardOrientation: flipped ? 'black' : 'white',
-                  boardStyle: { width: 520 },
+                  boardStyle: { width: boardWidth },
                   showNotation: settings.showCoordinates,
                   squareStyles: customSquareStyles(),
                   arrows: bestMoveArrows(),
