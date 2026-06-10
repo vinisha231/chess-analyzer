@@ -30,6 +30,8 @@ import { getOpeningName } from './utils/openings'
 import { getBoardColors } from './utils/boardThemes'
 import { detectGamePhase, phaseLabel } from './utils/gamePhase'
 import { SoundEngine } from './utils/soundEngine'
+import { buildShareUrl, readSharedFen, clearShareHash } from './utils/share'
+import { downloadPGN } from './utils/pgn'
 
 const DEFAULT_SETTINGS: GameSettings = {
   theme: 'dark',
@@ -98,6 +100,16 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('chess-player-names', JSON.stringify(playerNames))
   }, [playerNames])
+
+  // Load a shared position from the URL hash on first mount
+  useEffect(() => {
+    const sharedFen = readSharedFen()
+    if (sharedFen && loadFromFEN(sharedFen)) {
+      setToast('Shared position loaded')
+      clearShareHash()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (gameState.isGameOver) {
